@@ -141,6 +141,10 @@ class Trie:
 class TrieEditor:
     def __init__(self):
         self.trie = Trie()
+    
+    def is_valid_filename(self, filename):
+        invalid_chars = set('<>:"/\\|?*')
+        return filename and not any(char in invalid_chars for char in filename)
 
     def command_prompt(self):
         # Start with an empty Trie
@@ -169,33 +173,43 @@ class TrieEditor:
                 continue
                 
             command_parts = user_input.split(maxsplit=1)
-            cmd = command_parts[0][0] if command_parts[0] else ''
-            arg = command_parts[0][1:] if len(command_parts[0]) > 1 else ''
+            # Extract command and argument
+            raw_input = command_parts[0]
+            cmd = raw_input[0] if raw_input else ''
+            arg = raw_input[1:] if len(raw_input) > 1 else ''
             if len(command_parts) > 1:
                 arg += ' ' + command_parts[1]
+            
+            arg = arg.strip()
                 
             if cmd == '+':
-                if arg:
-                    self.trie.insert(arg.strip())
-                    print(f"Added '{arg.strip()}' to trie.")
+                if arg.isalpha():
+                    self.trie.insert(arg)
+                    print(f"Added '{arg}' to trie.")
+                elif arg:
+                    print("Invalid input! Please make sure the word contains letters only, no symbols.")
                 else:
                     print("Please provide a word to add.")
             elif cmd == '-':
-                if arg:
-                    if self.trie.search(arg.strip()):
-                        self.trie.delete(arg.strip())
-                        print(f"Deleted '{arg.strip()}' from trie.")
+                if arg.isalpha():
+                    if self.trie.search(arg):
+                        self.trie.delete(arg)
+                        print(f"Deleted '{arg}' from trie.")
                     else:
                         print("Is not a keyword in trie.")
+                elif arg:
+                    print("Invalid input! Please make sure the word contains letters only, no symbols.")
                 else:
                     print("Please provide a word to delete.")
             elif cmd == '?':
-                if arg:
-                    found = self.trie.search(arg.strip())
+                if arg.isalpha():
+                    found = self.trie.search(arg)
                     if found:
-                        print(f'Keyword "{arg.strip()}" is present.')
+                        print(f'Keyword "{arg}" is present.')
                     else:
-                        print(f'Keyword "{arg.strip()}" is not present.')
+                        print(f'Keyword "{arg}" is not present.')
+                elif arg:
+                    print("Invalid input! Please make sure the word contains letters only, no symbols.")
                 else:
                     print("Please provide a word to search.")
             elif cmd == '#':
@@ -217,14 +231,28 @@ class TrieEditor:
                     print("No filename entered.")
             elif cmd == '=':
                 if arg:
-                    self.trie.save_keywords_to_file(arg.strip())
-                    print(f"All keywords with frequencies written to '{arg.strip()}'.")
+                    if self.is_valid_filename(arg):
+                        try:
+                            self.trie.save_keywords_to_file(arg)
+                            print(f"All keywords with frequencies written to '{arg}'.")
+                        except OSError:
+                            print(f"Error: Cannot write to '{arg}'. Please use a valid filename.")
+                    else:
+                        print("Invalid filename! Please avoid special characters like \\ / : * ? \" < > |")
                 else:
                     print("Please enter new filename: ", end='')
                     filename = input().strip()
                     if filename:
-                        self.trie.save_keywords_to_file(filename)
-                        print(f"All keywords with frequencies written to '{filename}'.")
+                        if self.is_valid_filename(filename):
+                            try:
+                                self.trie.save_keywords_to_file(filename)
+                                print(f"All keywords with frequencies written to '{filename}'.")
+                            except OSError:
+                                print(f"Error: Cannot write to '{filename}'. Please use a valid filename.")
+                        else:
+                            print("Invalid filename! Please avoid special characters like \\ / : * ? \" < > |")
+                    else:
+                        print("No filename entered.")
             elif cmd == '!':
                 self.command_prompt()
                 return  # Restart prompt after showing instructions
