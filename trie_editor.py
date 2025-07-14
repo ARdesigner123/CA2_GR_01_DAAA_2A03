@@ -228,7 +228,7 @@ class TrieEditor:
             elif cmd == '!':
                 self.command_prompt()
                 return  # Restart prompt after showing instructions
-            if cmd == '\\':
+            elif cmd == '\\':
                 print("Exiting the Full Command Prompt . Bye...\n")
                 print("Press enter key, to continue...")
                 input()

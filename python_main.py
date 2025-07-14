@@ -55,7 +55,7 @@ def main():
             # Call your function here
         elif choice == '5':
             print("You selected Extra Feature One (Aaron Ng): Wildcard Search\n")
-            feature = WildcardSearchFeature(Trie)  # ✅ Pass Trie class
+            feature = WildcardSearchFeature(Trie)  #Pass Trie class
             feature.run()
         elif choice == '6':
             print("You selected Extra Feature Two (Aaron Ng)\n")
