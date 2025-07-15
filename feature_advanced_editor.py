@@ -8,16 +8,16 @@ class AdvancedTrieFeature(FeatureBase):
 
     def command_prompt(self):
         print("""
-------------------------------------------------------------
+--------------------------------------------------------------------
 Advanced Trie Tools - Feature 5 (Aaron Ng)
-------------------------------------------------------------
+--------------------------------------------------------------------
 Commands:
     ~file1,file2    Load and merge two Trie keyword files into one
     >file.txt       Show top 5 keywords (by frequency) from a file
     ^old,new        Replace 'old' keyword with 'new' in current Trie
     !               Print instructions again
     \               Exit to main menu
-------------------------------------------------------------
+--------------------------------------------------------------------
         """)
 
         while True:
