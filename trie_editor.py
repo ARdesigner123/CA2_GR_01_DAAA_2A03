@@ -1,4 +1,7 @@
 import os
+from user_interface import UserInterface
+
+UI = UserInterface()
 
 class TrieNode:
     def __init__(self):
@@ -138,128 +141,179 @@ class Trie:
         except FileNotFoundError:
             print(f"File '{filename}' not found.")
 
+    def get_words_with_prefix(self, prefix):
+        results = []
+
+        def _dfs(node, current_prefix, index):
+            if index == len(prefix):
+                if node.is_end_of_word:
+                    results.append((current_prefix, node.frequency))
+                for ch, next_node in node.children.items():
+                    _dfs(next_node, current_prefix + ch, index)
+                return
+
+            ch = prefix[index]
+            if ch == '*':
+                for next_ch, next_node in node.children.items():
+                    _dfs(next_node, current_prefix + next_ch, index + 1)
+            elif ch in node.children:
+                _dfs(node.children[ch], current_prefix + ch, index + 1)
+
+        _dfs(self.root, '', 0)
+        return results
+
+
+
 class TrieEditor:
     def __init__(self):
         self.trie = Trie()
-    
+
     def is_valid_filename(self, filename):
         invalid_chars = set('<>:"/\\|?*')
         return filename and not any(char in invalid_chars for char in filename)
 
-    def command_prompt(self):
+    def get_input(self):
+        print("> ", end='')  # Prompt with "> "
+        user_input = input().strip()
+
+        if not user_input:
+            return '', ''  # return empty cmd and arg
+
+        command_parts = user_input.split(maxsplit=1)
+        cmd = command_parts[0][0] if command_parts[0] else ''
+        arg = command_parts[0][1:] if len(command_parts[0]) > 1 else ''
+        if len(command_parts) > 1:
+            arg += ' ' + command_parts[1]
+
+        return cmd, arg
+    
+    def terminate(self):
+        print("Exiting the Full Command Prompt . Bye...\n")
+        print("Press enter key, to continue...")
+        input()
+        
+
+    def command_prompt(self, function):
         # Start with an empty Trie
         self.trie = Trie()
-        print("------------------------------------------------------------")
-        print("Construct/Edit Trie Commands:")
-        print("    '+','.','?','#','@','~','=','!','\\'")
-        print("------------------------------------------------------------")
-        print("    +sunshine       (add a keyword)")
-        print("    -moonlight      (delete a keyword)")
-        print("    ?rainbow        (find a keyword)")
-        print("    #               (display Trie)")
-        print("    @               (write Trie to file)")
-        print("    ~               (read keywords from file to make Trie)")
-        print("    =               (write keywords from Trie to file)")
-        print("    !               (print instructions)")
-        print("    \\               (exit\")")
-        print("------------------------------------------------------------")
-        print(">#")
-        print("[]")  # Show empty Trie at start
-        
-        while True:
-            print("> ", end='')  # Prompt with "> "
-            user_input = input().strip()
-            if not user_input:
-                continue
-                
-            command_parts = user_input.split(maxsplit=1)
-            # Extract command and argument
-            raw_input = command_parts[0]
-            cmd = raw_input[0] if raw_input else ''
-            arg = raw_input[1:] if len(raw_input) > 1 else ''
-            if len(command_parts) > 1:
-                arg += ' ' + command_parts[1]
-            
-            arg = arg.strip()
-                
-            if cmd == '+':
-                if arg.isalpha():
-                    self.trie.insert(arg)
-                    print(f"Added '{arg}' to trie.")
-                elif arg:
-                    print("Invalid input! Please make sure the word contains letters only, no symbols.")
-                else:
-                    print("Please provide a word to add.")
-            elif cmd == '-':
-                if arg.isalpha():
-                    if self.trie.search(arg):
-                        self.trie.delete(arg)
-                        print(f"Deleted '{arg}' from trie.")
+
+        if function == "construct_edit":
+            UI.construct_edit()
+            while True:
+                cmd, arg = self.get_input()
+                if not cmd:
+                    continue
+                    
+                if cmd == '+':
+                    if arg.isalpha():
+                        self.trie.insert(arg)
+                        print(f"Added '{arg}' to trie.")
+                    elif arg:
+                        print("Invalid input! Please make sure the word contains letters only, no symbols.")
                     else:
-                        print("Is not a keyword in trie.")
-                elif arg:
-                    print("Invalid input! Please make sure the word contains letters only, no symbols.")
-                else:
-                    print("Please provide a word to delete.")
-            elif cmd == '?':
-                if arg.isalpha():
-                    found = self.trie.search(arg)
-                    if found:
-                        print(f'Keyword "{arg}" is present.')
+                        print("Please provide a word to add.")
+                elif cmd == '-':
+                    if arg.isalpha():
+                        if self.trie.search(arg):
+                            self.trie.delete(arg)
+                            print(f"Deleted '{arg}' from trie.")
+                        else:
+                            print("Is not a keyword in trie.")
+                    elif arg:
+                        print("Invalid input! Please make sure the word contains letters only, no symbols.")
                     else:
-                        print(f'Keyword "{arg}" is not present.')
-                elif arg:
-                    print("Invalid input! Please make sure the word contains letters only, no symbols.")
-                else:
-                    print("Please provide a word to search.")
-            elif cmd == '#':
-                self.trie.display()
-            elif cmd == '@':
-                print("Please enter new filename: ", end='')
-                filename = input().strip()
-                if filename:
-                    self.trie.save_trie_visual(filename)
-                    print(f"Trie saved to '{filename}'.")
-                else:
-                    print("No filename entered.")
-            elif cmd == '~':
-                print("Please enter input file: ", end='')
-                filename = input().strip()
-                if filename:
-                    self.trie.load_keywords_from_file(filename)
-                else:
-                    print("No filename entered.")
-            elif cmd == '=':
-                if arg:
-                    if self.is_valid_filename(arg):
-                        try:
-                            self.trie.save_keywords_to_file(arg)
-                            print(f"All keywords with frequencies written to '{arg}'.")
-                        except OSError:
-                            print(f"Error: Cannot write to '{arg}'. Please use a valid filename.")
+                        print("Please provide a word to delete.")
+                elif cmd == '?':
+                    if arg.isalpha():
+                        found = self.trie.search(arg)
+                        if found:
+                            print(f'Keyword "{arg}" is present.')
+                        else:
+                            print(f'Keyword "{arg}" is not present.')
+                    elif arg:
+                        print("Invalid input! Please make sure the word contains letters only, no symbols.")
                     else:
-                        print("Invalid filename! Please avoid special characters like \\ / : * ? \" < > |")
-                else:
+                        print("Please provide a word to search.")
+                elif cmd == '@':
                     print("Please enter new filename: ", end='')
                     filename = input().strip()
                     if filename:
-                        if self.is_valid_filename(filename):
+                        self.trie.save_trie_visual(filename)
+                        print(f"Trie saved to '{filename}'.")
+                    else:
+                        print("No filename entered.")
+                elif cmd == '~':
+                    print("Please enter input file: ", end='')
+                    filename = input().strip()
+                    if filename:
+                        self.trie.load_keywords_from_file(filename)
+                    else:
+                        print("No filename entered.")
+                elif cmd == '=':
+                    if arg:
+                        if self.is_valid_filename(arg):
                             try:
-                                self.trie.save_keywords_to_file(filename)
-                                print(f"All keywords with frequencies written to '{filename}'.")
+                                self.trie.save_keywords_to_file(arg)
+                                print(f"All keywords with frequencies written to '{arg}'.")
                             except OSError:
-                                print(f"Error: Cannot write to '{filename}'. Please use a valid filename.")
+                                print(f"Error: Cannot write to '{arg}'. Please use a valid filename.")
                         else:
                             print("Invalid filename! Please avoid special characters like \\ / : * ? \" < > |")
                     else:
-                        print("No filename entered.")
-            elif cmd == '!':
-                self.command_prompt()
-                return  # Restart prompt after showing instructions
-            elif cmd == '\\':
-                print("Exiting the Full Command Prompt . Bye...\n")
-                print("Press enter key, to continue...")
-                input()
-                return
-            else:
-                print("Invalid command! Please try again.")
+                        print("Please enter new filename: ", end='')
+                        filename = input().strip()
+                        if filename:
+                            if self.is_valid_filename(filename):
+                                try:
+                                    self.trie.save_keywords_to_file(filename)
+                                    print(f"All keywords with frequencies written to '{filename}'.")
+                                except OSError:
+                                    print(f"Error: Cannot write to '{filename}'. Please use a valid filename.")
+                            else:
+                                print("Invalid filename! Please avoid special characters like \\ / : * ? \" < > |")
+                        else:
+                            print("No filename entered.")
+                elif cmd == '#':
+                    self.trie.display()
+                elif cmd == '!':
+                    self.command_prompt("construct_edit")
+                    return  # Restart prompt after showing instructions
+                elif cmd == '\\':
+                    self.terminate()
+                    return
+                else:
+                    print("Invalid command! Please try again.")
+        elif function == "predict_restore":
+                UI.predict_restore()
+                while True:
+                    cmd, arg = self.get_input()
+                    if not cmd:
+                        continue
+
+                    if cmd == '~':
+                        print("Please enter input file: ", end='')
+                        filename = input().strip()
+                        if filename:
+                            self.trie.load_keywords_from_file(filename)
+                        else:
+                            print("No filename entered.")
+                    elif cmd == '#':
+                        self.trie.display()
+                    elif cmd == '$':
+                        output = self.trie.get_words_with_prefix(arg)
+                        print(output)
+                    elif cmd == '?':
+                        print("Invalid command! Please try again.")
+                    elif cmd == '&':
+                        print("Invalid command! Please try again.")
+                    elif cmd == '@':
+                        print("Invalid command! Please try again.")
+                    elif cmd == '!':
+                        self.command_prompt("predict_restore")
+                        return  # Restart prompt after showing instructions
+                    elif cmd == '\\':
+                        self.terminate()
+                        return
+                    else:
+                        print("Invalid command! Please try again.")
+                        

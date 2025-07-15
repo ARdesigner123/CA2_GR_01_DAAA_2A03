@@ -5,48 +5,25 @@ group_members = [
 ]
 
 from trie_editor import TrieEditor, Trie
-from feature_advanced_editor import AdvancedTrieFeature  # Add this to the top
-
-# Function to display the banner
-def print_banner():
-    print("*****************************************************************")
-    print("* ST1507 DSAA: Predictive Text Editor (using tries)             *")
-    print("*---------------------------------------------------------------*")
-    print("*                                                               *")
-    print("* - Done by: Stephen Bermudo (2442657) & Aaron Ng (2442631)     *")
-    print("* - Class DAAA/2B/10                                            *")
-    print("*                                                               *")
-    print("*****************************************************************\n\n")
-
-# Function to display the menu
-def display_menu():
-    print("Please select your choice ('1','2','3','4','5','6','7'):")
-    print("    1. Construct/Edit Trie")
-    print("    2. Predict/Restore Text")
-    print("    ----------------------------------------------------")
-    print("    3. Extra Feature One (Stephen Bermudo):")
-    print("    4. Extra Feature Two (Stephen Bermudo):")
-    print("    ----------------------------------------------------")
-    print("    5. Advanced Trie Tools (Aaron Ng):")
-    print("    6. Extra Feature Two (Aaron Ng):")
-    print("    ----------------------------------------------------")
-    print("    7. Exit")
+from feature_wildcard_search import WildcardSearchFeature
+from user_interface import UserInterface
     
 # Main program loop
 def main():
-    print_banner()  # Show banner only once
+    UI = UserInterface()
     trie_editor = TrieEditor()
+    UI.print_banner()  # Show banner only once
 
     while True:
-        display_menu()
+        UI.display_menu()
         choice = input("Enter choice: ").strip()
         
         if choice == '1':
             print("You selected Option 1: Construct/Edit Trie\n")
-            trie_editor.command_prompt()
+            trie_editor.command_prompt("construct_edit")
         elif choice == '2':
             print("You selected Option 2: Predict/Restore Text\n")
-            # Call your function here
+            trie_editor.command_prompt("predict_restore")
         elif choice == '3':
             print("You selected Extra Feature One (Stephen Bermudo)\n")
             # Call your function here
