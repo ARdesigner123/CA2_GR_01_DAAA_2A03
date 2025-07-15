@@ -11,7 +11,9 @@ class AdvancedTrieFeature(FeatureBase):
         print("Advanced Trie Tools - Feature 5 (Aaron Ng)")
         print("----------------------------------------------------------------------")
         print("    ~file1,file2    (load and merge two Trie keyword files into one)")
-        print("    >file.txt       (show top 5 keywords by frequency from a file)")
+        print("    >file.txt       (show top keywords by frequency from a file)")
+        print("    +               (add a keyword to a TXT file and update Trie)")
+        print("    -               (remove a keyword from a TXT file and update Trie)")
         print("    ^               (replace 'old' keyword with 'new' in current Trie)")
         print("    !               (print instructions again)")
         print("    \\               (exit)")
@@ -31,7 +33,13 @@ class AdvancedTrieFeature(FeatureBase):
                 self.load_and_merge_files(args)
 
             elif command == '>':
-                self.display_top_5(args)
+                self.display_top(args)
+            
+            elif command == '+':
+                self.increment_keyword()
+            
+            elif command == '-':
+                self.decrement_keyword()
 
             elif command == '^':
                 self.replace_word(args)
@@ -54,38 +62,161 @@ class AdvancedTrieFeature(FeatureBase):
         if ',' not in arg:
             print("Invalid format. Use: ~file1.txt,file2.txt")
             return
-
+        
         file1, file2 = map(str.strip, arg.split(',', 1))
-
+        
         if not os.path.exists(file1) or not os.path.exists(file2):
             print(f"One or both files '{file1}', '{file2}' do not exist.")
             return
-
+        
         print(f"Merging tries from '{file1}' and '{file2}'...")
 
         self.trie = self.trie_class()  # Reset current trie
         self.trie.load_keywords_from_file(file1)
         self.trie.load_keywords_from_file(file2)
-
+        
         print("Merge complete. Displaying merged trie:")
         self.trie.display()
+        
+        # Ask user if they want to save the merged Trie
+        print("\nDo you want to save the merged Trie to a new TXT file? (yes/no): ", end='')
+        save = input().strip().lower()
+        
+        if save == 'yes':
+            print("Enter filename to save the merged Trie (e.g., merged.txt): ", end='')
+            save_filename = input().strip()
+            
+            if save_filename == '':
+                print("Invalid filename. Merged Trie not saved.")
+                return
+            
+            self.trie.save_keywords_to_file(save_filename)
+            print(f"Merged Trie has been saved to '{save_filename}'.")
+        else:
+            print("Merged Trie was not saved.")
 
-    def display_top_5(self, filename):
+    def display_top(self, filename):
         if not os.path.exists(filename):
             print(f"File '{filename}' not found.")
             return
-
+        
         temp_trie = self.trie_class()
         temp_trie.load_keywords_from_file(filename)
-
+        
         all_words = temp_trie.get_all_words_with_freq()
-        top_5 = sorted(all_words, key=lambda x: x[1], reverse=True)[:5]
-
-        print("Top 5 keywords by frequency:")
-        for word, freq in top_5:
+        if not all_words:
+            print(f"No keywords found in '{filename}'.")
+            return
+        
+        # Ask user how many top keywords they want
+        while True:
+            print("Enter how many top keywords to display (e.g., 5): ", end='')
+            try:
+                top_n = int(input().strip())
+                if top_n <= 0:
+                    print("Please enter a positive integer.")
+                    continue
+                break
+            except ValueError:
+                print("Invalid number. Please enter a valid integer.")
+        
+        top_n_keywords = sorted(all_words, key=lambda x: x[1], reverse=True)[:top_n]
+        
+        print(f"\nTop {top_n} keywords by frequency:")
+        for word, freq in top_n_keywords:
             print(f" - {word}: {freq}")
-            
     
+    def increment_keyword(self):
+        print("Enter filename to load the Trie from: ", end='')
+        filename = input().strip()
+        
+        if not filename or not os.path.exists(filename):
+            print(f"File '{filename}' not found.")
+            return
+        
+        self.trie = self.trie_class()
+        self.trie.load_keywords_from_file(filename)
+        
+        while True:
+            print("Enter +keyword to add (e.g., +cat): ", end='')
+            user_input = input().strip()
+            if not user_input.startswith('+') or len(user_input) <= 1:
+                print("Invalid format. Use: +keyword")
+                continue
+            
+            keyword = user_input[1:].strip()
+            if not keyword:
+                print("Keyword cannot be empty.")
+                continue
+            
+            self.trie.insert(keyword)
+            print(f"'{keyword}' has been added to the Trie (frequency increased by 1).")
+            
+            print("\nUpdated Trie structure:")
+            self.trie.display()
+            
+            print("\nDo you want to add another keyword? (yes/no): ", end='')
+            again = input().strip().lower()
+            if again != 'yes':
+                break
+        
+        # Ask to save
+        print("\nDo you want to update and save the TXT file? (yes/no): ", end='')
+        save_choice = input().strip().lower()
+        if save_choice == 'yes':
+            self.trie.save_keywords_to_file(filename)
+            print(f"Trie has been saved to '{filename}'.")
+        else:
+            print("Changes were not saved.")
+    
+    def decrement_keyword(self):
+        print("Enter filename to load the Trie from: ", end='')
+        filename = input().strip()
+        
+        if not filename or not os.path.exists(filename):
+            print(f"File '{filename}' not found.")
+            return
+        
+        self.trie = self.trie_class()
+        self.trie.load_keywords_from_file(filename)
+        
+        while True:
+            print("Enter -keyword to subtract (e.g., -cat): ", end='')
+            user_input = input().strip()
+            if not user_input.startswith('-') or len(user_input) <= 1:
+                print("Invalid format. Use: -keyword")
+                continue
+            
+            keyword = user_input[1:].strip()
+            if not keyword:
+                print("Keyword cannot be empty.")
+                continue
+            
+            all_words = dict(self.trie.get_all_words_with_freq())
+            if keyword not in all_words:
+                print(f"'{keyword}' not found in the Trie.")
+                continue
+            
+            self.trie.delete(keyword)
+            print(f"One occurrence of '{keyword}' has been removed from the Trie.")
+            
+            print("\nUpdated Trie structure:")
+            self.trie.display()
+            
+            print("\nDo you want to subtract another keyword? (yes/no): ", end='')
+            again = input().strip().lower()
+            if again != 'yes':
+                break
+        
+        # Ask to save
+        print("\nDo you want to update and save the TXT file? (yes/no): ", end='')
+        save_choice = input().strip().lower()
+        if save_choice == 'yes':
+            self.trie.save_keywords_to_file(filename)
+            print(f"Trie has been saved to '{filename}'.")
+        else:
+            print("Changes were not saved.")
+
     def replace_word(self, args):
         print("Enter filename to load the Trie from: ", end='')
         filename = input().strip()

@@ -1,0 +1,5 @@
+car,1
+care,1
+card,1
+case,1
+dog,2
