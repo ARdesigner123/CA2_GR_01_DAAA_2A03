@@ -7,18 +7,15 @@ class AdvancedTrieFeature(FeatureBase):
         self.trie = self.trie_class()
 
     def command_prompt(self):
-        print("""
---------------------------------------------------------------------
-Advanced Trie Tools - Feature 5 (Aaron Ng)
---------------------------------------------------------------------
-Commands:
-    ~file1,file2    Load and merge two Trie keyword files into one
-    >file.txt       Show top 5 keywords (by frequency) from a file
-    ^old,new        Replace 'old' keyword with 'new' in current Trie
-    !               Print instructions again
-    \               Exit to main menu
---------------------------------------------------------------------
-        """)
+        print("----------------------------------------------------------------------")
+        print("Advanced Trie Tools - Feature 5 (Aaron Ng)")
+        print("----------------------------------------------------------------------")
+        print("    ~file1,file2    (load and merge two Trie keyword files into one)")
+        print("    >file.txt       (show top 5 keywords by frequency from a file)")
+        print("    ^old,new        (replace 'old' keyword with 'new' in current Trie)")
+        print("    !               (print instructions again)")
+        print("    \\               (exit)")
+        print("----------------------------------------------------------------------")
 
         while True:
             print("[Feature 5] > ", end='')

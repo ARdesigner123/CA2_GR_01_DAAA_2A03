@@ -30,8 +30,12 @@ class Trie:
             if index == len(word):
                 if not current.is_end_of_word:
                     return False
-                current.is_end_of_word = False
-                return len(current.children) == 0
+                # Decrement frequency or unset end_of_word if freq reaches 0
+                current.frequency -= 1
+                if current.frequency == 0:
+                    current.is_end_of_word = False
+                    return len(current.children) == 0  # prune if no children
+                return False  # don’t prune if freq > 0
             ch = word[index]
             if ch not in current.children:
                 return False

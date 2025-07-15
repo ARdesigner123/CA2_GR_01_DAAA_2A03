@@ -5,7 +5,7 @@ group_members = [
 ]
 
 from trie_editor import TrieEditor, Trie
-from feature_wildcard_search import WildcardSearchFeature
+from feature_advanced_editor import AdvancedTrieFeature
 from user_interface import UserInterface
     
 # Main program loop
@@ -31,7 +31,7 @@ def main():
             print("You selected Extra Feature Two (Stephen Bermudo)\n")
             # Call your function here
         elif choice == '5':
-            print("You selected Extra Feature One (Aaron Ng): Advanced Trie Tools\n")
+            print("You selected Option 5: Advanced Trie Tools (Aaron Ng)\n")
             feature5 = AdvancedTrieFeature(Trie)
             feature5.run()
         elif choice == '6':
