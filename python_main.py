@@ -31,9 +31,9 @@ def main():
             print("You selected Extra Feature Two (Stephen Bermudo)\n")
             # Call your function here
         elif choice == '5':
-            print("You selected Extra Feature One (Aaron Ng): Wildcard Search\n")
-            feature = WildcardSearchFeature(Trie)  #Pass Trie class
-            feature.run()
+            print("You selected Extra Feature One (Aaron Ng): Advanced Trie Tools\n")
+            feature5 = AdvancedTrieFeature(Trie)
+            feature5.run()
         elif choice == '6':
             print("You selected Extra Feature Two (Aaron Ng)\n")
             # Call your function here
