@@ -26,24 +26,29 @@ class Trie:
             current.frequency = 1  # new word
 
     def delete(self, word):
-        def _delete(current, word, index):
-            if index == len(word):
-                if not current.is_end_of_word:
-                    return False
-                # Decrement frequency or unset end_of_word if freq reaches 0
-                current.frequency -= 1
-                if current.frequency == 0:
-                    current.is_end_of_word = False
-                    return len(current.children) == 0  # prune if no children
-                return False  # don’t prune if freq > 0
-            ch = word[index]
-            if ch not in current.children:
+        def _delete(node, word, depth):
+            if depth == len(word):
+                if not node.is_end_of_word:
+                    return False  # Word doesn't exist
+                node.frequency -= 1
+                if node.frequency <= 0:
+                    node.is_end_of_word = False
+                    node.frequency = 0
+                    return len(node.children) == 0
                 return False
-            should_delete_child = _delete(current.children[ch], word, index + 1)
+            
+            ch = word[depth]
+            if ch not in node.children:
+                return False
+            
+            should_delete_child = _delete(node.children[ch], word, depth + 1)
+            
             if should_delete_child:
-                del current.children[ch]
-                return len(current.children) == 0 and not current.is_end_of_word
+                del node.children[ch]
+                return not node.is_end_of_word and len(node.children) == 0
+            
             return False
+        
         _delete(self.root, word, 0)
 
     def search(self, word):
