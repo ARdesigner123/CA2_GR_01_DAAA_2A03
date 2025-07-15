@@ -23,7 +23,7 @@ def main():
             trie_editor.command_prompt("construct_edit")
         elif choice == '2':
             print("You selected Option 2: Predict/Restore Text\n")
-            # Call your function here
+            trie_editor.command_prompt("predict_restore")
         elif choice == '3':
             print("You selected Extra Feature One (Stephen Bermudo)\n")
             # Call your function here

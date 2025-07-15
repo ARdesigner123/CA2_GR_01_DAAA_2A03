@@ -141,6 +141,29 @@ class Trie:
         except FileNotFoundError:
             print(f"File '{filename}' not found.")
 
+    def get_words_with_prefix(self, prefix):
+        results = []
+
+        def _dfs(node, current_prefix, index):
+            if index == len(prefix):
+                if node.is_end_of_word:
+                    results.append((current_prefix, node.frequency))
+                for ch, next_node in node.children.items():
+                    _dfs(next_node, current_prefix + ch, index)
+                return
+
+            ch = prefix[index]
+            if ch == '*':
+                for next_ch, next_node in node.children.items():
+                    _dfs(next_node, current_prefix + next_ch, index + 1)
+            elif ch in node.children:
+                _dfs(node.children[ch], current_prefix + ch, index + 1)
+
+        _dfs(self.root, '', 0)
+        return results
+
+
+
 class TrieEditor:
     def __init__(self):
         self.trie = Trie()
@@ -163,13 +186,19 @@ class TrieEditor:
             arg += ' ' + command_parts[1]
 
         return cmd, arg
+    
+    def terminate(self):
+        print("Exiting the Full Command Prompt . Bye...\n")
+        print("Press enter key, to continue...")
+        input()
+        
 
     def command_prompt(self, function):
         # Start with an empty Trie
         self.trie = Trie()
-        UI.construct_edit()
 
         if function == "construct_edit":
+            UI.construct_edit()
             while True:
                 cmd, arg = self.get_input()
                 if not cmd:
@@ -244,17 +273,18 @@ class TrieEditor:
                                 print("Invalid filename! Please avoid special characters like \\ / : * ? \" < > |")
                         else:
                             print("No filename entered.")
+                elif cmd == '#':
+                    self.trie.display()
                 elif cmd == '!':
-                    self.command_prompt()
+                    self.command_prompt("construct_edit")
                     return  # Restart prompt after showing instructions
                 elif cmd == '\\':
-                    print("Exiting the Full Command Prompt . Bye...\n")
-                    print("Press enter key, to continue...")
-                    input()
+                    self.terminate()
                     return
                 else:
                     print("Invalid command! Please try again.")
         elif function == "predict_restore":
+                UI.predict_restore()
                 while True:
                     cmd, arg = self.get_input()
                     if not cmd:
@@ -268,9 +298,10 @@ class TrieEditor:
                         else:
                             print("No filename entered.")
                     elif cmd == '#':
-                        print("Invalid command! Please try again.")
+                        self.trie.display()
                     elif cmd == '$':
-                        print("Invalid command! Please try again.")
+                        output = self.trie.get_words_with_prefix(arg)
+                        print(output)
                     elif cmd == '?':
                         print("Invalid command! Please try again.")
                     elif cmd == '&':
@@ -278,9 +309,11 @@ class TrieEditor:
                     elif cmd == '@':
                         print("Invalid command! Please try again.")
                     elif cmd == '!':
-                        print("Invalid command! Please try again.")
+                        self.command_prompt("predict_restore")
+                        return  # Restart prompt after showing instructions
                     elif cmd == '\\':
-                        print("Invalid command! Please try again.")
+                        self.terminate()
+                        return
                     else:
                         print("Invalid command! Please try again.")
                         
