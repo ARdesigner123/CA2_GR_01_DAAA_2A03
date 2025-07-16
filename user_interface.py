@@ -23,7 +23,7 @@ class UserInterface():
         print("    4. Extra Feature Two (Stephen Bermudo):")
         print("    ----------------------------------------------------")
         print("    5. Advanced Trie Tools (Aaron Ng):")
-        print("    6. Extra Feature Two (Aaron Ng):")
+        print("    6. Keyword Analysis Feature (Aaron Ng):")
         print("    ----------------------------------------------------")
         print("    7. Exit")
 

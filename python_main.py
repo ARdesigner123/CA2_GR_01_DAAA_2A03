@@ -7,6 +7,7 @@ group_members = [
 from trie_editor import TrieEditor, Trie
 from feature_advanced_editor import AdvancedTrieFeature
 from user_interface import UserInterface
+from keyword_analysis_feature import KeywordAnalysisFeature
     
 # Main program loop
 def main():
@@ -35,8 +36,9 @@ def main():
             feature5 = AdvancedTrieFeature(Trie)
             feature5.run()
         elif choice == '6':
-            print("You selected Extra Feature Two (Aaron Ng)\n")
-            # Call your function here
+            print("You selected Option 6: Keyword Analysis Feature (Aaron Ng)\n")
+            feature6 = KeywordAnalysisFeature(Trie)
+            feature6.run()
         elif choice == '7':
             print("Exiting the program. Goodbye!\n")
             break

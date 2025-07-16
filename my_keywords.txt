@@ -1,4 +1,5 @@
-car,4
-card,2
+car,3
+card,3
 care,1
 cast,1
+dog,1
