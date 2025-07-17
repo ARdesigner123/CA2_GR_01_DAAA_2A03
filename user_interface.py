@@ -27,7 +27,7 @@ class UserInterface():
         print("    ----------------------------------------------------")
         print("    7. Exit")
 
-    def construct_edit(self):
+    def construct_edit(self, show_empty_trie=True):
         print("------------------------------------------------------------")
         print("Construct/Edit Trie Commands:")
         print("    '+','.','?','#','@','~','=','!','\\'")
@@ -42,8 +42,9 @@ class UserInterface():
         print("    !               (print instructions)")
         print("    \\               (exit\")")
         print("------------------------------------------------------------")
-        print(">#")
-        print("[]")  # Show empty Trie at start
+        if show_empty_trie:
+            print(">#")
+            print("[]")
 
     def predict_restore(self):
         print("------------------------------------------------------------")

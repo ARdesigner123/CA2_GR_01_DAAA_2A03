@@ -202,12 +202,13 @@ class TrieEditor:
         input()
         
 
-    def command_prompt(self, function):
-        # Start with an empty Trie
-        self.trie = Trie()
-
+    def command_prompt(self, function, repeat=False):
         if function == "construct_edit":
-            UI.construct_edit()
+            if not repeat:
+                self.trie = Trie()
+                UI.construct_edit(show_empty_trie=True)
+            else:
+                UI.construct_edit(show_empty_trie=False)
             while True:
                 cmd, arg = self.get_input()
                 if not cmd:
@@ -285,8 +286,8 @@ class TrieEditor:
                 elif cmd == '#':
                     self.trie.display()
                 elif cmd == '!':
-                    self.command_prompt("construct_edit")
-                    return  # Restart prompt after showing instructions
+                    UI.construct_edit(show_empty_trie=False)
+                    continue
                 elif cmd == '\\':
                     self.terminate()
                     return
