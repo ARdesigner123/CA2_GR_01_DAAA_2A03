@@ -256,6 +256,7 @@ class TrieEditor:
                     print("Please enter input file: ", end='')
                     filename = input().strip()
                     if filename:
+                        self.trie = Trie()  # Reset trie before loading new file
                         self.trie.load_keywords_from_file(filename)
                     else:
                         print("No filename entered.")
