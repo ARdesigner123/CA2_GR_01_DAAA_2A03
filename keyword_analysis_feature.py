@@ -27,7 +27,7 @@ class KeywordAnalysisFeature(FeatureBase):
     def command_prompt(self):
         self.print_instructions()
         while True:
-            print("[Extra Feature 2] > ", end='')
+            print("[Feature 6] > ", end='')
             user_input = input().strip()
 
             if not user_input:
