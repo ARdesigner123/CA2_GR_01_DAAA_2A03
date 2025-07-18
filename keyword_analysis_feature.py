@@ -1,15 +1,24 @@
+# ----------------------------------------
+# keyword_analysis_feature.py
+# Keyword Analysis Feature Implementation
+# Done By Aaron
+# ----------------------------------------
+
 from feature_base import FeatureBase
 import os
 
 class KeywordAnalysisFeature(FeatureBase):
+    # Initialize with two Trie instances for comparison or transfer
     def __init__(self, trie_class):
         self.trie_class = trie_class
         self.trie1 = self.trie_class()
         self.trie2 = self.trie_class()
-
+    
+    # Entry point for the feature
     def run(self):
         self.command_prompt()
-
+    
+    # Print available commands for the feature
     def print_instructions(self):
         print("----------------------------------------------------------------------")
         print("Extra Feature Two - Keyword Tools (Aaron Ng)")
@@ -23,7 +32,8 @@ class KeywordAnalysisFeature(FeatureBase):
         print("    !              (Print instructions again)")
         print("    \\              (Exit this feature)")
         print("----------------------------------------------------------------------")
-
+    
+    # Main loop that takes user input and triggers appropriate methods
     def command_prompt(self):
         self.print_instructions()
         while True:
@@ -55,7 +65,8 @@ class KeywordAnalysisFeature(FeatureBase):
                 break
             else:
                 print("Invalid command. Use ! to see instructions.")
-
+    
+    # Compare common keywords between two files
     def compare_keywords(self, arg):
         if ',' not in arg:
             print("Invalid format. Use: =file1.txt,file2.txt")
@@ -67,6 +78,7 @@ class KeywordAnalysisFeature(FeatureBase):
             print(f"One or both files '{file1}', '{file2}' do not exist.")
             return
 
+        # Load both tries
         trie1 = self.trie_class()
         trie1.load_keywords_from_file(file1)
         words1 = set(w for w, _ in trie1.get_all_words_with_freq())
@@ -75,6 +87,7 @@ class KeywordAnalysisFeature(FeatureBase):
         trie2.load_keywords_from_file(file2)
         words2 = set(w for w, _ in trie2.get_all_words_with_freq())
 
+        # Find common keywords
         common = words1.intersection(words2)
 
         if not common:
@@ -83,7 +96,8 @@ class KeywordAnalysisFeature(FeatureBase):
             print("Common keywords:")
             for word in sorted(common):
                 print(f" - {word}")
-
+    
+    # Transfer a keyword from one file to another
     def transfer_keyword(self, arg):
         if ',' not in arg:
             print("Invalid format. Use: >from.txt,to.txt")
@@ -109,7 +123,7 @@ class KeywordAnalysisFeature(FeatureBase):
                 print(f"'{word}' not found in '{file1}'.")
                 continue
             
-            # Transfer only ONE instance
+            # Transfer one instance of the keyword
             self.trie1.delete(word)
             self.trie2.insert(word)
             
@@ -134,7 +148,8 @@ class KeywordAnalysisFeature(FeatureBase):
             print("Changes saved.")
         else:
             print("Changes were not saved.")
-
+    
+    # Sort and display keywords from longest to shortest
     def sort_keywords_by_length(self, filename):
         if not os.path.exists(filename):
             print(f"File '{filename}' not found.")
@@ -149,6 +164,7 @@ class KeywordAnalysisFeature(FeatureBase):
         for word, freq in sorted_words:
             print(f" - {word} ({freq})")
     
+    # Group and display keywords alphabetically
     def group_by_alphabet(self, filename):
         if not os.path.exists(filename):
             print(f"File '{filename}' not found.")
@@ -170,7 +186,8 @@ class KeywordAnalysisFeature(FeatureBase):
             print(f"\n{letter}:")
             for word, freq in sorted(grouped[letter]):
                 print(f"  - {word} ({freq})")
-
+    
+    # Show the top starting letters by frequency
     def top_starting_letters(self, filename):
         if not os.path.exists(filename):
             print(f"File '{filename}' not found.")
@@ -193,6 +210,7 @@ class KeywordAnalysisFeature(FeatureBase):
         for letter, count in sorted_letters:
             print(f"  - {letter}: {count} words")
     
+    # Display palindromic keywords from file
     def find_palindromes(self, filename):
         if not os.path.exists(filename):
             print(f"File '{filename}' not found.")

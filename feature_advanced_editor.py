@@ -1,12 +1,20 @@
+# ----------------------------------------
+# feature_advanced_editor.py
+# Advanced Trie Tools Implementation
+# Done By Aaron
+# ----------------------------------------
+
 from feature_base import FeatureBase
 import os
 
 class AdvancedTrieFeature(FeatureBase):
     def __init__(self, trie_class):
+        # Store the Trie class reference and create a new Trie instance
         self.trie_class = trie_class
         self.trie = self.trie_class()
 
     def command_prompt(self):
+        # Display feature banner and command instructions
         print("----------------------------------------------------------------------")
         print("Advanced Trie Tools - Feature 5 (Aaron Ng)")
         print("----------------------------------------------------------------------")
@@ -19,6 +27,7 @@ class AdvancedTrieFeature(FeatureBase):
         print("    \\               (exit)")
         print("----------------------------------------------------------------------")
 
+        # Main loop to handle user input commands
         while True:
             print("[Feature 5] > ", end='')
             user_input = input().strip()
@@ -56,21 +65,25 @@ class AdvancedTrieFeature(FeatureBase):
                 print("Invalid command. Use ! to see instructions.")
 
     def run(self):
+        # Run this feature through the command prompt
         self.command_prompt()
 
     def load_and_merge_files(self, arg):
+        # Parse filenames and check format
         if ',' not in arg:
             print("Invalid format. Use: ~file1.txt,file2.txt")
             return
         
         file1, file2 = map(str.strip, arg.split(',', 1))
         
+        # Check file existence
         if not os.path.exists(file1) or not os.path.exists(file2):
             print(f"One or both files '{file1}', '{file2}' do not exist.")
             return
         
         print(f"Merging tries from '{file1}' and '{file2}'...")
 
+        # Reset and load both Tries
         self.trie = self.trie_class()  # Reset current trie
         self.trie.load_keywords_from_file(file1)
         self.trie.load_keywords_from_file(file2)
@@ -78,7 +91,7 @@ class AdvancedTrieFeature(FeatureBase):
         print("Merge complete. Displaying merged trie:")
         self.trie.display()
         
-        # Ask user if they want to save the merged Trie
+        # Ask to save merged Trie
         print("\nDo you want to save the merged Trie to a new TXT file? (yes/no): ", end='')
         save = input().strip().lower()
         
@@ -96,6 +109,7 @@ class AdvancedTrieFeature(FeatureBase):
             print("Merged Trie was not saved.")
 
     def display_top(self, filename):
+        # Load file and build a temporary Trie
         if not os.path.exists(filename):
             print(f"File '{filename}' not found.")
             return
@@ -108,7 +122,7 @@ class AdvancedTrieFeature(FeatureBase):
             print(f"No keywords found in '{filename}'.")
             return
         
-        # Ask user how many top keywords they want
+        # Ask user for number of top keywords
         while True:
             print("Enter how many top keywords to display (e.g., 5): ", end='')
             try:
@@ -120,6 +134,7 @@ class AdvancedTrieFeature(FeatureBase):
             except ValueError:
                 print("Invalid number. Please enter a valid integer.")
         
+        # Sort by frequency descending
         top_n_keywords = sorted(all_words, key=lambda x: x[1], reverse=True)[:top_n]
         
         print(f"\nTop {top_n} keywords by frequency:")
@@ -127,6 +142,7 @@ class AdvancedTrieFeature(FeatureBase):
             print(f" - {word}: {freq}")
     
     def increment_keyword(self):
+        # Add new keyword(s) to the file and Trie
         print("Enter filename to load the Trie from: ", end='')
         filename = input().strip()
         
@@ -170,6 +186,7 @@ class AdvancedTrieFeature(FeatureBase):
             print("Changes were not saved.")
     
     def decrement_keyword(self):
+        # Remove keyword(s) from the file and Trie
         print("Enter filename to load the Trie from: ", end='')
         filename = input().strip()
         
@@ -218,6 +235,7 @@ class AdvancedTrieFeature(FeatureBase):
             print("Changes were not saved.")
 
     def replace_word(self, args):
+        # Replace old keyword with new one in the file
         print("Enter filename to load the Trie from: ", end='')
         filename = input().strip()
         

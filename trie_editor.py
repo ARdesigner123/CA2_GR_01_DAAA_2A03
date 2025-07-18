@@ -3,16 +3,21 @@ from user_interface import UserInterface
 
 UI = UserInterface()
 
+# ----------------------- Trie Node Class -----------------------
+# Class created by Aaron to represent each node in the trie
 class TrieNode:
     def __init__(self):
         self.children = {}
         self.is_end_of_word = False
-        self.frequency = 0  # NEW: to store frequency count
+        self.frequency = 0  # Stores frequency of word appearance
 
+# ----------------------- Trie Class -----------------------
+# Class created by Aaron. Main trie implementation to support insert, delete, search, etc.
 class Trie:
     def __init__(self):
         self.root = TrieNode()
-
+    
+    # Insert a word and update frequency
     def insert(self, word):
         current = self.root
         for ch in word:
@@ -24,7 +29,8 @@ class Trie:
         else:
             current.is_end_of_word = True
             current.frequency = 1  # new word
-
+    
+    # Delete one occurrence of a word
     def delete(self, word):
         def _delete(node, word, depth):
             if depth == len(word):
@@ -50,7 +56,8 @@ class Trie:
             return False
         
         _delete(self.root, word, 0)
-
+    
+    # Search for a word in the trie
     def search(self, word):
         current = self.root
         for ch in word:
@@ -58,7 +65,8 @@ class Trie:
                 return False
             current = current.children[ch]
         return current.is_end_of_word
-
+    
+    # Display the trie visually with indentations
     def display(self, node=None):
         if node is None:
             node = self.root
@@ -88,7 +96,8 @@ class Trie:
             for line in result:
                 print(line)
         print("]")
-
+    
+    # Return all words and their frequencies
     def get_all_words_with_freq(self):
         words = []
         
@@ -101,12 +110,14 @@ class Trie:
         _dfs(self.root)
         return words
     
+    # Save all keywords with frequencies to a file
     def save_keywords_to_file(self, filename):
         words_with_freq = self.get_all_words_with_freq()
         with open(filename, 'w') as f:
             for word, freq in words_with_freq:
                 f.write(f'{word},{freq}\n')
     
+    # Save visual representation of the trie to file
     def save_trie_visual(self, filename):
         def _display_node(node, prefix='', depth=0):
             lines = []
@@ -132,6 +143,7 @@ class Trie:
             for line in lines:
                 f.write(line + '\n')
     
+    # Load keywords from file and populate the trie
     def load_keywords_from_file(self, filename):
         try:
             with open(filename, 'r') as f:
@@ -149,7 +161,8 @@ class Trie:
             print(f"Keywords loaded from '{filename}'.")
         except FileNotFoundError:
             print(f"File '{filename}' not found.")
-
+    
+    # Get predictions with support for wildcards '*'
     def get_words_with_prefix(self, prefix):
         results = []
 
@@ -171,16 +184,19 @@ class Trie:
         _dfs(self.root, '', 0)
         return results
 
-
-
+# ----------------------- Trie Editor Class -----------------------
+# This class handles command-line interactions for the user. Class Created By Aaron
 class TrieEditor:
+    #Done By Aaron
     def __init__(self):
         self.trie = Trie()
-
+    
+    # Validate file name Done By Aaron
     def is_valid_filename(self, filename):
         invalid_chars = set('<>:"/\\|?*')
         return filename and not any(char in invalid_chars for char in filename)
-
+    
+    # Handle command input parsing Done By Aaron
     def get_input(self):
         print("> ", end='')  # Prompt with "> "
         user_input = input().strip()
@@ -196,12 +212,13 @@ class TrieEditor:
 
         return cmd, arg
     
+    # # Graceful exit Done By Aaron
     def terminate(self):
         print("Exiting the Full Command Prompt . Bye...\n")
         print("Press enter key, to continue...")
         input()
-        
-
+    
+    # Handle command prompt logic for construct_edit and predict_restore Done By Aaron
     def command_prompt(self, function, repeat=False):
         if function == "construct_edit":
             if not repeat:
@@ -294,6 +311,7 @@ class TrieEditor:
                     return
                 else:
                     print("Invalid command! Please try again.")
+        #Done By Stephen
         elif function == "predict_restore":
                 UI.predict_restore()
                 while True:
