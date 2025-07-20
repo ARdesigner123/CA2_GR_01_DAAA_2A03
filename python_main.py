@@ -5,7 +5,7 @@ group_members = [
 ]
 
 from trie_editor import TrieEditor, Trie
-from feature_wildcard_search import WildcardSearchFeature
+from feature_advanced_editor import AdvancedTrieFeature
 from user_interface import UserInterface
     
 # Main program loop

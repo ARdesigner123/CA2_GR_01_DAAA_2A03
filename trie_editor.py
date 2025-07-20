@@ -161,6 +161,29 @@ class Trie:
 
         _dfs(self.root, '', 0)
         return results
+    
+    def find_best_match(self, pattern):
+        best_match = ("", -1)  # (word, frequency)
+
+        def _dfs(node, index, path):
+            nonlocal best_match
+
+            if index == len(pattern):
+                if node.is_end_of_word:
+                    if node.frequency > best_match[1]:
+                        best_match = (path, node.frequency)
+                return
+
+            ch = pattern[index]
+            if ch == '*':
+                for next_ch, child in node.children.items():
+                    _dfs(child, index + 1, path + next_ch)
+            elif ch in node.children:
+                _dfs(node.children[ch], index + 1, path + ch)
+
+        _dfs(self.root, 0, "")
+        return best_match[0] if best_match[1] > 0 else None
+
 
 
 
@@ -300,17 +323,24 @@ class TrieEditor:
                     elif cmd == '#':
                         self.trie.display()
                     elif cmd == '$':
-                        output = self.trie.get_words_with_prefix(arg)
-                        print(output)
+                        print(', '.join(f"{word} ({freq})" for word, freq in self.trie.get_words_with_prefix(arg)))
                     elif cmd == '?':
-                        print("Invalid command! Please try again.")
+                        if arg:
+                            result = self.trie.find_best_match(arg)
+                            if result:
+                                print(f'Restored word: {result}')
+                            else:
+                                print("No matching word found.")
+                        else:
+                            print("Please provide a pattern to match.")
+
                     elif cmd == '&':
                         print("Invalid command! Please try again.")
                     elif cmd == '@':
                         print("Invalid command! Please try again.")
                     elif cmd == '!':
                         self.command_prompt("predict_restore")
-                        return  # Restart prompt after showing instructions
+                        return
                     elif cmd == '\\':
                         self.terminate()
                         return
