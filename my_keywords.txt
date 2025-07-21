@@ -1,5 +1,5 @@
-cat,2
-car,1
-card,1
+car,3
+card,2
 care,1
-case,1
+cast,1
+dog,1

@@ -1,0 +1,9 @@
+car,4
+card,2
+care,2
+cast,1
+case,1
+dog,2
+racecar,1
+level,1
+wow,3

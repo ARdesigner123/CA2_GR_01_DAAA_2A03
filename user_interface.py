@@ -1,8 +1,8 @@
 
-
+#Class Created By Stephen
 class UserInterface():
 
-    # Function to display the banner
+    # Function to display the banner (Aaron)
     def print_banner(self):
         print("*****************************************************************")
         print("* ST1507 DSAA: Predictive Text Editor (using tries)             *")
@@ -13,7 +13,7 @@ class UserInterface():
         print("*                                                               *")
         print("*****************************************************************\n\n")
 
-    # Function to display the menu
+    # Function to display the menu (Aaron)
     def display_menu(self):
         print("Please select your choice ('1','2','3','4','5','6','7'):")
         print("    1. Construct/Edit Trie")
@@ -23,11 +23,12 @@ class UserInterface():
         print("    4. Extra Feature Two (Stephen Bermudo):")
         print("    ----------------------------------------------------")
         print("    5. Advanced Trie Tools (Aaron Ng):")
-        print("    6. Extra Feature Two (Aaron Ng):")
+        print("    6. Keyword Analysis Feature (Aaron Ng):")
         print("    ----------------------------------------------------")
         print("    7. Exit")
-
-    def construct_edit(self):
+    
+    # Function to Display Feature 1 (Aaron)
+    def construct_edit(self, show_empty_trie=True):
         print("------------------------------------------------------------")
         print("Construct/Edit Trie Commands:")
         print("    '+','.','?','#','@','~','=','!','\\'")
@@ -42,9 +43,12 @@ class UserInterface():
         print("    !               (print instructions)")
         print("    \\               (exit\")")
         print("------------------------------------------------------------")
-        print(">#")
-        print("[]")  # Show empty Trie at start
-
+        # If Trie is empty
+        if show_empty_trie:
+            print(">#")
+            print("[]")
+    
+    # Function to Display Feature 2 (Stephen)
     def predict_restore(self):
         print("------------------------------------------------------------")
         print("Predict/Restore Text Commands:")
