@@ -1,4 +1,6 @@
 import os
+import re
+import string
 from user_interface import UserInterface
 
 UI = UserInterface()
@@ -98,17 +100,35 @@ class Trie:
         print("]")
     
     # Return all words and their frequencies
-    def get_all_words_with_freq(self):
+    def get_all_words_with_freq(self, prefix='', frequency=True):
+        # Helper: find the node of the prefix first
+        def find_prefix_node(node, prefix):
+            current = node
+            for ch in prefix:
+                if ch not in current.children:
+                    return None
+                current = current.children[ch]
+            return current
+
+        start_node = find_prefix_node(self.root, prefix)
+        if not start_node:
+            return []
+
         words = []
-        
-        def _dfs(current, current_prefix=''):
+
+        def _dfs(current, current_prefix):
             if current.is_end_of_word:
-                words.append((current_prefix, current.frequency))
+                if frequency:
+                    words.append((current_prefix, current.frequency))
+                else:
+                    words.append(current_prefix)
             for ch, node in current.children.items():
                 _dfs(node, current_prefix + ch)
-        
-        _dfs(self.root)
+
+        _dfs(start_node, prefix)
         return words
+
+
     
     # Save all keywords with frequencies to a file
     def save_keywords_to_file(self, filename):
@@ -205,6 +225,51 @@ class Trie:
 
         _dfs(self.root, 0, "")
         return best_match[0] if best_match[1] > 0 else None
+    
+    def separate_words(self, text):
+        return text.strip().split()
+
+    def loop_Sentence(self, array):
+        result = []
+        for word in array:
+            # Separate trailing punctuation except '*'
+            stripped_word = word.rstrip(string.punctuation.replace('*', ''))
+            trailing_punct = word[len(stripped_word):]
+
+            if '*' in word:
+                restored_word = self.find_best_match(stripped_word)
+                if restored_word is not None:
+                    result.append(restored_word + trailing_punct)
+                else:
+                    result.append(word)
+            else:
+                result.append(word)
+        return ' '.join(result)
+    
+    def loop_Sentence_AllMatches(self, array):
+        result = []
+        for word in array:
+            stripped_word = word.rstrip(string.punctuation.replace('*', ''))
+            trailing_punct = word[len(stripped_word):]
+            stripped_word_clean = stripped_word.rstrip('*')
+
+            if '*' in word:
+                matches = self.get_all_words_with_freq(stripped_word_clean, False)
+                if matches:
+                    result.append('/'.join(matches) + trailing_punct)
+                else:
+                    result.append(word)
+            else:
+                result.append(word)
+        return ' '.join(result)
+
+
+
+
+
+
+        
+
 
 
 # ----------------------- Trie Editor Class -----------------------
@@ -364,9 +429,11 @@ class TrieEditor:
                             print("Please provide a pattern to match.")
 
                     elif cmd == '&':
-                        print("Invalid command! Please try again.")
+                        word_array = self.trie.separate_words(arg)
+                        print(self.trie.loop_Sentence_AllMatches(word_array))
                     elif cmd == '@':
-                        print("Invalid command! Please try again.")
+                        word_array = self.trie.separate_words(arg)
+                        print(self.trie.loop_Sentence(word_array))
                     elif cmd == '!':
                         self.command_prompt("predict_restore")
                         return
