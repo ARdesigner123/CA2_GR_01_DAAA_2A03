@@ -9,6 +9,7 @@ from trie_editor import TrieEditor, Trie
 from feature_advanced_editor import AdvancedTrieFeature
 from user_interface import UserInterface
 from keyword_analysis_feature import KeywordAnalysisFeature
+
     
 # ---------------------------
 # Main program loop (Done by Aaron)
@@ -43,15 +44,14 @@ def main():# Create User Interface and Trie Editor instances
         # Extra Feature One (To be implemented by Stephen)
         # ---------------------------
         elif choice == '3':
-            print("You selected Extra Feature One (Stephen Bermudo)\n")
-            # Call your function here
-        
+            print("You selected Trie Charter (Stephen Bermudo)\n")
+            trie_editor.command_prompt("trieChart")
         # ---------------------------
         # Extra Feature Two (To be implemented by Stephen)
         # ---------------------------
         elif choice == '4':
-            print("You selected Extra Feature Two (Stephen Bermudo)\n")
-            # Call your function here
+            print("You selected Inbuilt Analytics (Stephen Bermudo)\n")
+            trie_editor.command_prompt("autoComplete")
         
         # ---------------------------
         # Option 5: Advanced Trie Tools (Done by Aaron)

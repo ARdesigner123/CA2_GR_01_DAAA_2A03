@@ -2,6 +2,9 @@ import os
 import re
 import string
 from user_interface import UserInterface
+import matplotlib.pyplot as plt
+from collections import Counter
+import networkx as nx
 
 UI = UserInterface()
 
@@ -127,8 +130,95 @@ class Trie:
 
         _dfs(start_node, prefix)
         return words
+    
+    def get_top_n_frequent_words(self, n):
+        result = []
+        node_visits = 0
 
+        def dfs(node, path):
+            nonlocal node_visits
+            node_visits += 1
+            if node.is_end_of_word:
+                result.append(("".join(path), node.frequency))
+            for ch in node.children:
+                dfs(node.children[ch], path + [ch])
+        dfs(self.root, [])
+        result.sort(key=lambda x: (-x[1], x[0]))
+        return result[:n], node_visits  # Return results and node visits
 
+    def get_n_longest_words(self, n):
+        result = []
+        node_visits = 0
+
+        def dfs(node, path):
+            nonlocal node_visits
+            node_visits += 1
+            if node.is_end_of_word:
+                result.append(("".join(path), len(path)))
+            for ch in node.children:
+                dfs(node.children[ch], path + [ch])
+        dfs(self.root, [])
+        result.sort(key=lambda x: (-x[1], x[0]))
+        return result[:n], node_visits  # Return results and node visits
+
+    def get_word_length_histogram(self):
+        from collections import defaultdict
+        length_hist = defaultdict(int)
+        node_visits = 0
+
+        def dfs(node, depth):
+            nonlocal node_visits
+            node_visits += 1
+            if node.is_end_of_word:
+                length_hist[depth] += 1
+            for ch in node.children:
+                dfs(node.children[ch], depth + 1)
+        dfs(self.root, 0)
+        return dict(sorted(length_hist.items())), node_visits  # Return histogram and node visits
+    
+    def _visualize_trie_structure(self):
+        print("Generating trie structure visualization with networkx...")
+
+        G = nx.DiGraph()
+        node_id = 0
+        node_map = {}  # Map (id(path)) → node id in networkx
+
+        def dfs(node, path):
+            nonlocal node_id
+            current_id = node_id
+            label = path[-1] if path else "ROOT"
+            G.add_node(current_id, label=label)
+            node_map[id(node)] = current_id
+            node_id += 1
+
+            for ch, child in node.children.items():
+                child_id = dfs(child, path + ch)
+                G.add_edge(current_id, child_id)
+
+            return current_id
+
+        dfs(self.trie.root, "")
+
+        labels = nx.get_node_attributes(G, 'label')
+        pos = nx.spring_layout(G, k=0.5, iterations=100)
+        plt.figure(figsize=(12, 8))
+        nx.draw(G, pos, with_labels=True, labels=labels, node_color='skyblue', node_size=1200, font_size=10, arrows=True)
+        plt.title("Trie Structure")
+        plt.show()
+
+    def get_words_with_substring(self, substring):
+        matches = {}
+
+        def dfs(node, path):
+            if node.is_end_of_word:
+                word = path
+                if substring in word:
+                    matches[word] = node.frequency
+            for ch, child in node.children.items():
+                dfs(child, path + ch)
+
+        dfs(self.root, "")
+        return matches
     
     # Save all keywords with frequencies to a file
     def save_keywords_to_file(self, filename):
@@ -284,6 +374,15 @@ class TrieEditor:
         invalid_chars = set('<>:"/\\|?*')
         return filename and not any(char in invalid_chars for char in filename)
     
+    def load_trie_from_folder(self):
+        path = UI.get_trie_folder_and_file()
+        if path:
+            self.trie = Trie()  # Reset current trie
+            self.trie.load_keywords_from_file(path)
+            print("Trie loaded from selected file.")
+        else:
+            print("No file selected.")
+    
     # Handle command input parsing Done By Aaron
     def get_input(self):
         print("> ", end='')  # Prompt with "> "
@@ -306,6 +405,138 @@ class TrieEditor:
         print("Press enter key, to continue...")
         input()
     
+    def _plot_bar_chart(self, title, data, xlabel, ylabel):
+        labels = list(data.keys())
+        values = list(data.values())
+        plt.figure(figsize=(10, 5))
+        plt.bar(labels, values, color='skyblue')
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
+
+    def _chart_by_first_letter(self):
+        print("Generating chart by first letter...")
+        letter_counts = Counter()
+
+        def dfs(node, path):
+            if node.is_end_of_word and path:
+                letter_counts[path[0]] += 1
+            for ch in node.children:
+                dfs(node.children[ch], path + ch)
+
+        dfs(self.trie.root, "")
+        self._plot_bar_chart("Words by Starting Letter", letter_counts, "First Letter", "Word Count")
+
+    def _chart_by_word_length(self):
+        print("Generating chart by word length...")
+        length_data, _ = self.trie.get_word_length_histogram()
+        self._plot_bar_chart("Words by Length", length_data, "Word Length", "Frequency")
+
+    def _chart_by_frequency(self):
+        print("Generating chart by frequency...")
+        top_words, _ = self.trie.get_top_n_frequent_words(20)
+        word_freqs = {word: freq for word, freq in top_words}
+        self._plot_bar_chart("Top 20 Frequent Words", word_freqs, "Word", "Frequency")
+
+    def _visualize_trie_structure(self):
+        print("Visualizing trie structure...")
+
+        G = nx.DiGraph()
+        pos = {}  # Positions of nodes for plotting
+        x_offset = [0]  # Mutable x position tracker
+
+        def dfs(node, label, depth):
+            current_label = label
+            pos[current_label] = (x_offset[0], -depth)  # Position: (x, -y)
+            x_offset[0] += 1  # Move right for next sibling
+
+            for char, child in node.children.items():
+                child_label = label + char
+                G.add_edge(current_label, child_label)
+                dfs(child, child_label, depth + 1)
+
+        dfs(self.trie.root, "", 0)
+
+        plt.figure(figsize=(14, 8))
+        nx.draw(
+            G, pos,
+            with_labels=True,
+            node_size=1200,
+            node_color="lightblue",
+            font_size=9,
+            arrows=True
+        )
+        plt.title("Trie Structure (Letter Inheritance Tree)")
+        plt.axis('off')
+        plt.show()
+
+    def _autoComplete_recursive(self, prefix, guesses):
+        suggestions = self.trie.get_words_with_prefix(prefix)
+        if not suggestions:
+            print("No more suggestions. Ending round.")
+            return guesses
+
+        # Take up to 3 suggestions to show
+        current_guesses = suggestions[:3]
+        UI.Game_UI(current_guesses)
+
+        # Ask user if any guess is correct
+        user_input = input("Is the word one of these? Enter number (1-3), or 'n' for none: ").strip().lower()
+        if user_input in ['1', '2', '3']:
+            chosen_index = int(user_input) - 1
+            chosen_word = current_guesses[chosen_index]
+            print(f"Great! The word is '{chosen_word}'.")
+            guesses.append(chosen_word)
+            return guesses
+        elif user_input == 'n':
+            # User says none matched, ask for next prefix to narrow down
+            new_prefix = input("Enter more letters to refine your guess (or just press Enter to stop): ").strip().lower()
+            if not new_prefix:
+                print("Stopping round.")
+                return guesses
+            return self._autoComplete_recursive(prefix + new_prefix, guesses)
+        else:
+            print("Invalid input, try again.")
+            return self._autoComplete_recursive(prefix, guesses)
+
+    def _start_autoComplete_round(self):
+        if not hasattr(self, 'recent_rounds'):
+            self.recent_rounds = []
+
+        query = input("Enter initial prefix to start autocomplete: ").strip()
+        if not query:
+            print("Empty input. Try again.")
+            return
+
+        guesses = self._autoComplete_recursive(query, [])
+
+        if guesses:
+            print("Round completed! Your guesses were:", guesses)
+        else:
+            print("No guesses were made this round.")
+
+        self.recent_rounds.append((query, guesses))
+
+
+    def _review_recent_rounds(self):
+            if not hasattr(self, 'recent_rounds'):
+                self.recent_rounds = []
+
+            if not self.recent_rounds:
+                print("No recent rounds to review.")
+                return
+
+            print("Recent Rounds:")
+            for i, (query, guesses) in enumerate(self.recent_rounds[-5:], 1):
+                print(f"Round {i}: Query = '{query}'")
+                for rank, guess in enumerate(guesses, 1):
+                    print(f"   {rank}: {guess}")
+                print("-" * 50)
+
+
     # Handle command prompt logic for construct_edit and predict_restore Done By Aaron
     def command_prompt(self, function, repeat=False):
         if function == "construct_edit":
@@ -417,8 +648,12 @@ class TrieEditor:
                     elif cmd == '#':
                         self.trie.display()
                     elif cmd == '$':
+                        print("Please enter input word: ", end='')
+                        arg = input().strip()
                         print(', '.join(f"{word} ({freq})" for word, freq in self.trie.get_words_with_prefix(arg)))
                     elif cmd == '?':
+                        print("Please enter input word: ", end='')
+                        arg = input().strip()
                         if arg:
                             result = self.trie.find_best_match(arg)
                             if result:
@@ -429,9 +664,13 @@ class TrieEditor:
                             print("Please provide a pattern to match.")
 
                     elif cmd == '&':
+                        print("Please enter input text or sentence: ", end='')
+                        arg = input().strip()
                         word_array = self.trie.separate_words(arg)
                         print(self.trie.loop_Sentence_AllMatches(word_array))
                     elif cmd == '@':
+                        print("Please enter input text or sentence: ", end='')
+                        arg = input().strip()
                         word_array = self.trie.separate_words(arg)
                         print(self.trie.loop_Sentence(word_array))
                     elif cmd == '!':
@@ -442,4 +681,60 @@ class TrieEditor:
                         return
                     else:
                         print("Invalid command! Please try again.")
+
+        elif function == "trieChart":
+            UI.getTrieChart()
+            while True:
+                cmd = input("Chart Command: ").strip()
+
+                if cmd == '~':
+                    print("Please enter input file: ", end='')
+                    filename = input().strip()
+                    if filename:
+                        self.trie.load_keywords_from_file(filename)
+                    else:
+                        print("No filename entered.")
+                elif cmd == '^':
+                    self._chart_by_first_letter()
+
+                elif cmd == '!':
+                    self._chart_by_word_length()
+
+                elif cmd == '%':
+                    self._chart_by_frequency()
+
+                elif cmd == '*':
+                    self._visualize_trie_structure()
+
+                elif cmd == '\\':
+                    print("Exiting Trie Chart Drawing.")
+                    break
+
+                else:
+                    print("Invalid command.")
+        
+        elif function == "autoComplete":
+                UI.autoCompleteGame()
+                while True:
+                    cmd = input("Game Command: ").strip()
+                    if cmd == '~':
+                        print("Please enter input file: ", end='')
+                        filename = input().strip()
+                        if filename:
+                            self.trie.load_keywords_from_file(filename)
+                        else:
+                            print("No filename entered.")
+                    elif cmd == '#':
+                        self.trie.display()
+                    elif cmd == '1':
+                        self._start_autoComplete_round()
+                    elif cmd == '2':
+                        self._review_recent_rounds()
+                    elif cmd == '\\':
+                        print("Exiting Auto Complete Game.")
+                        break
+                    else:
+                        print("Invalid Command.")
+
+            
                         
