@@ -5,18 +5,20 @@ group_members = [
 ]
 
 # Import required classes from other modules
-from trie_editor import TrieEditor, Trie
+from trie import Trie
+from trie_editor import TrieEditor
+from TrieCommandHandler import TrieCommandHandler
 from feature_advanced_editor import AdvancedTrieFeature
 from user_interface import UserInterface
 from keyword_analysis_feature import KeywordAnalysisFeature
-
     
 # ---------------------------
 # Main program loop (Done by Aaron)
 # ---------------------------
 def main():# Create User Interface and Trie Editor instances
+    trie_instance = Trie()
+    TCH = TrieCommandHandler()  
     UI = UserInterface()
-    trie_editor = TrieEditor()
 
     # Display welcome banner once at the start
     UI.print_banner()
@@ -31,34 +33,34 @@ def main():# Create User Interface and Trie Editor instances
         # ---------------------------
         if choice == '1': 
             print("You selected Option 1: Construct/Edit Trie\n")
-            trie_editor.command_prompt("construct_edit")
+            TCH.command_prompt("construct_edit")
         
         # ---------------------------
         # Option 2: Predict/Restore Text (Done by Stephen)
         # ---------------------------
         elif choice == '2':
             print("You selected Option 2: Predict/Restore Text\n")
-            trie_editor.command_prompt("predict_restore")
+            TCH.command_prompt("predict_restore")
         
         # ---------------------------
         # Extra Feature One (To be implemented by Stephen)
         # ---------------------------
         elif choice == '3':
             print("You selected Trie Charter (Stephen Bermudo)\n")
-            trie_editor.command_prompt("trieChart")
+            TCH.command_prompt("trieChart")
         # ---------------------------
         # Extra Feature Two (To be implemented by Stephen)
         # ---------------------------
         elif choice == '4':
             print("You selected Inbuilt Analytics (Stephen Bermudo)\n")
-            trie_editor.command_prompt("autoComplete")
+            TCH.command_prompt("autoComplete")
         
         # ---------------------------
         # Option 5: Advanced Trie Tools (Done by Aaron)
         # ---------------------------
         elif choice == '5':
             print("You selected Option 5: Advanced Trie Tools (Aaron Ng)\n")
-            feature5 = AdvancedTrieFeature(Trie)
+            feature5 = AdvancedTrieFeature(trie_instance)
             feature5.run()
         
         # ---------------------------
@@ -66,7 +68,7 @@ def main():# Create User Interface and Trie Editor instances
         # ---------------------------
         elif choice == '6':
             print("You selected Option 6: Keyword Analysis Feature (Aaron Ng)\n")
-            feature6 = KeywordAnalysisFeature(Trie)
+            feature6 = KeywordAnalysisFeature(trie_instance)
             feature6.run()
         
         # ---------------------------
