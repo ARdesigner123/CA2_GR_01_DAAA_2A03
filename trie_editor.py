@@ -131,50 +131,99 @@ class Trie:
         _dfs(start_node, prefix)
         return words
     
-    def get_top_n_frequent_words(self, n):
-        result = []
-        node_visits = 0
-
+    def get_longest_path(self):
         def dfs(node, path):
-            nonlocal node_visits
-            node_visits += 1
-            if node.is_end_of_word:
-                result.append(("".join(path), node.frequency))
-            for ch in node.children:
-                dfs(node.children[ch], path + [ch])
+            nonlocal longest_path
+            if node.is_end_of_word and len(path) > len(longest_path):
+                longest_path = path[:]
+            for char, child in node.children.items():
+                path.append(char)
+                dfs(child, path)
+                path.pop()
+
+        longest_path = []
         dfs(self.root, [])
-        result.sort(key=lambda x: (-x[1], x[0]))
-        return result[:n], node_visits  # Return results and node visits
+        return ''.join(longest_path)
 
-    def get_n_longest_words(self, n):
-        result = []
-        node_visits = 0
 
-        def dfs(node, path):
-            nonlocal node_visits
-            node_visits += 1
+    def visualize_subtree_from_prefix(self, prefix):
+
+        # Step 1: Find node corresponding to prefix
+        node = self.root
+        current = ""
+        for char in prefix:
+            if char in node.children:
+                node = node.children[char]
+                current += char
+            else:
+                print(f"Prefix '{prefix}' not found in trie.")
+                return
+
+        # Step 2: Build subtree from that node
+        G = nx.DiGraph()
+        def dfs(n, path_label):
+            for char, child in n.children.items():
+                next_label = path_label + char
+                G.add_edge(path_label, next_label)
+                dfs(child, next_label)
+
+        dfs(node, prefix)
+
+        # Step 3: Draw
+        pos = nx.spring_layout(G)
+        nx.draw(G, pos, with_labels=True, node_color='lightgreen', node_size=800, font_size=10, arrows=True)
+        plt.title(f"Subtree from prefix '{prefix}'")
+        plt.show()
+
+
+
+    def visualize_frequencies(self):
+
+        words = []
+        freqs = []
+
+        def dfs(node, prefix):
             if node.is_end_of_word:
-                result.append(("".join(path), len(path)))
-            for ch in node.children:
-                dfs(node.children[ch], path + [ch])
-        dfs(self.root, [])
-        result.sort(key=lambda x: (-x[1], x[0]))
-        return result[:n], node_visits  # Return results and node visits
+                words.append(prefix)
+                freqs.append(node.frequency)
+            for char, child in node.children.items():
+                dfs(child, prefix + char)
 
-    def get_word_length_histogram(self):
-        from collections import defaultdict
-        length_hist = defaultdict(int)
-        node_visits = 0
+        dfs(self.root, "")
 
-        def dfs(node, depth):
-            nonlocal node_visits
-            node_visits += 1
-            if node.is_end_of_word:
-                length_hist[depth] += 1
-            for ch in node.children:
-                dfs(node.children[ch], depth + 1)
-        dfs(self.root, 0)
-        return dict(sorted(length_hist.items())), node_visits  # Return histogram and node visits
+        if not words:
+            print("Trie is empty.")
+            return
+
+        plt.figure(figsize=(10, 5))
+        plt.bar(words, freqs, color='skyblue')
+        plt.xlabel("Words")
+        plt.ylabel("Frequency")
+        plt.title("Keyword Frequencies in Trie")
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.show()
+
+    def visualize_path(self, word):
+
+        G = nx.DiGraph()
+        node = self.root
+        current = ''
+        for char in word:
+            G.add_edge(current, current + char)
+            current += char
+            if char in node.children:
+                node = node.children[char]
+            else:
+                print(f"'{word}' not found in trie.")
+                return
+
+        pos = nx.spring_layout(G)
+        nx.draw(G, pos, with_labels=True, node_color='lightblue', arrows=True)
+        plt.title(f"Path for '{word}'")
+        plt.show()
+
+
     
     def _visualize_trie_structure(self):
         print("Generating trie structure visualization with networkx...")
@@ -354,14 +403,6 @@ class Trie:
         return ' '.join(result)
 
 
-
-
-
-
-        
-
-
-
 # ----------------------- Trie Editor Class -----------------------
 # This class handles command-line interactions for the user. Class Created By Aaron
 class TrieEditor:
@@ -417,30 +458,6 @@ class TrieEditor:
         plt.tight_layout()
         plt.show()
 
-    def _chart_by_first_letter(self):
-        print("Generating chart by first letter...")
-        letter_counts = Counter()
-
-        def dfs(node, path):
-            if node.is_end_of_word and path:
-                letter_counts[path[0]] += 1
-            for ch in node.children:
-                dfs(node.children[ch], path + ch)
-
-        dfs(self.trie.root, "")
-        self._plot_bar_chart("Words by Starting Letter", letter_counts, "First Letter", "Word Count")
-
-    def _chart_by_word_length(self):
-        print("Generating chart by word length...")
-        length_data, _ = self.trie.get_word_length_histogram()
-        self._plot_bar_chart("Words by Length", length_data, "Word Length", "Frequency")
-
-    def _chart_by_frequency(self):
-        print("Generating chart by frequency...")
-        top_words, _ = self.trie.get_top_n_frequent_words(20)
-        word_freqs = {word: freq for word, freq in top_words}
-        self._plot_bar_chart("Top 20 Frequent Words", word_freqs, "Word", "Frequency")
-
     def _visualize_trie_structure(self):
         print("Visualizing trie structure...")
 
@@ -487,10 +504,15 @@ class TrieEditor:
         user_input = input("Is the word one of these? Enter number (1-3), or 'n' for none: ").strip().lower()
         if user_input in ['1', '2', '3']:
             chosen_index = int(user_input) - 1
-            chosen_word = current_guesses[chosen_index]
-            print(f"Great! The word is '{chosen_word}'.")
-            guesses.append(chosen_word)
-            return guesses
+            if chosen_index < len(current_guesses):
+                chosen_word = current_guesses[chosen_index]
+                print(f"Great! The word is '{chosen_word}'.")
+                guesses.append(chosen_word)
+                return guesses
+            else:
+                print(f"Invalid input: only {len(current_guesses)} suggestion(s) shown.")
+                return self._autoComplete_recursive(prefix, guesses)
+
         elif user_input == 'n':
             # User says none matched, ask for next prefix to narrow down
             new_prefix = input("Enter more letters to refine your guess (or just press Enter to stop): ").strip().lower()
@@ -498,9 +520,11 @@ class TrieEditor:
                 print("Stopping round.")
                 return guesses
             return self._autoComplete_recursive(prefix + new_prefix, guesses)
+
         else:
             print("Invalid input, try again.")
             return self._autoComplete_recursive(prefix, guesses)
+
 
     def _start_autoComplete_round(self):
         if not hasattr(self, 'recent_rounds'):
@@ -695,14 +719,19 @@ class TrieEditor:
                     else:
                         print("No filename entered.")
                 elif cmd == '^':
-                    self._chart_by_first_letter()
+                    longest_word = self.trie.get_longest_path()
+                    print(f"Longest path (word): {longest_word}")
+                    self.trie.visualize_path(longest_word)
 
                 elif cmd == '!':
-                    self._chart_by_word_length()
+                    word = input("Enter word or prefix to visualize subtree from: ").strip()
+                    if word:
+                        self.trie.visualize_subtree_from_prefix(word)
+                    else:
+                        print("No word entered.")
 
                 elif cmd == '%':
-                    self._chart_by_frequency()
-
+                    self.trie.visualize_frequencies()
                 elif cmd == '*':
                     self._visualize_trie_structure()
 

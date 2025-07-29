@@ -234,6 +234,7 @@ flint,2
 glide,3
 haze,4
 iris,2
+flair,2
 joke,3
 keen,1
 lure,4
@@ -275,3 +276,4 @@ van,2
 wig,3
 yak,4
 zap,1
+flamethrower,1

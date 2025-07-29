@@ -72,10 +72,10 @@ class UserInterface():
         print("    '~','^','!','%','\\'")
         print("------------------------------------------------------------")
         print("    ~               (read keywords from file to make Trie)")
-        print("    ^               (Generate Chart)")
-        print("    !               (Generate Chart by length)")
-        print("    %               (Generate Chart by frequency)")
         print("    *               (Visualize Trie Structure with NetworkX)")
+        print("    ^               (Visualize Longest Trie Structure with NetworkX)")
+        print("    !               (Visualize Specifc Word/Prefix Path with NetworkX)")
+        print("    %               (Generate Chart by frequency)")
         print("    \\              (exit\")")
         print("------------------------------------------------------------")
 
