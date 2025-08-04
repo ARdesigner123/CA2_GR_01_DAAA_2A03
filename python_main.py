@@ -15,7 +15,7 @@ from keyword_analysis_feature import KeywordAnalysisFeature
 # ---------------------------
 # Main program loop (Done by Aaron)
 # ---------------------------
-def main():# Create User Interface and Trie Editor instances
+def main():
     trie_instance = Trie()
     TCH = TrieCommandHandler()  
     UI = UserInterface()

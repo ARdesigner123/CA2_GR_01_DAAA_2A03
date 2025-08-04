@@ -10,10 +10,10 @@ import os
 
 class KeywordAnalysisFeature(FeatureBase):
     # Initialize with two Trie instances for comparison or transfer
-    def __init__(self, trie_class):
-        self.trie_class = trie_class
-        self.trie1 = self.trie_class()
-        self.trie2 = self.trie_class()
+    def __init__(self, trie_instance):
+        self.trie1 = trie_instance
+        self.trie2 = trie_instance.__class__()  # Or create another one as needed
+        self.trie_class = trie_instance.__class__
     
     # Entry point for the feature
     def run(self):
