@@ -223,7 +223,8 @@ class TrieCommandHandler:
                     return
 
                 elif cmd == '\\':
-                    self.terminate()
+                    print("Predicting Restore Function")
+                    break
 
                 else:
                     print("Invalid command! Please try again.")
@@ -241,7 +242,7 @@ class TrieCommandHandler:
                         print("No filename entered.")
 
                 elif cmd == '^':
-                    longest_word = self.trie.get_longest_path()
+                    longest_word = self.visualizer.get_longest_path()
                     print(f"Longest path (word): {longest_word}")
                     self.visualizer.visualize_path(longest_word)
 

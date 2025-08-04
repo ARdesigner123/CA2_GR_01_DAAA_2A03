@@ -111,3 +111,17 @@ class TrieVisualizer:
                 node_size=800, font_size=10, arrows=True)
         plt.title(f"Subtree from prefix '{prefix}'")
         plt.show()
+
+    def get_longest_path(self):
+        def dfs(node, path):
+            nonlocal longest_path
+            if node.is_end_of_word and len(path) > len(longest_path):
+                longest_path = path[:]
+            for char, child in node.children.items():
+                path.append(char)
+                dfs(child, path)
+                path.pop()
+
+        longest_path = []
+        dfs(self.trie.root, [])
+        return ''.join(longest_path)

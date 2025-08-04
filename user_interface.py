@@ -21,7 +21,7 @@ class UserInterface():
         print("    2. Predict/Restore Text")
         print("    ----------------------------------------------------")
         print("    3. Visualise Trie Charts (Stephen Bermudo):")
-        print("    4. Inbuilt Analytics (Stephen Bermudo):")
+        print("    4. AutoComplete (Stephen Bermudo):")
         print("    ----------------------------------------------------")
         print("    5. Advanced Trie Tools (Aaron Ng):")
         print("    6. Keyword Analysis Feature (Aaron Ng):")
