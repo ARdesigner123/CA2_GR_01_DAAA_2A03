@@ -5,6 +5,7 @@
 # ----------------------------------------
 
 from feature_base import FeatureBase
+from user_interface import UserInterface
 import os
 
 class KeywordAnalysisFeature(FeatureBase):
@@ -20,18 +21,8 @@ class KeywordAnalysisFeature(FeatureBase):
     
     # Print available commands for the feature
     def print_instructions(self):
-        print("----------------------------------------------------------------------")
-        print("Extra Feature Two - Keyword Tools (Aaron Ng)")
-        print("----------------------------------------------------------------------")
-        print("    =file1,file2   (Compare common keywords in both TXT files)")
-        print("    >from,to       (Transfer a keyword from one TXT file to another)")
-        print("    #file.txt      (Show keywords from longest to shortest)")
-        print("    *file.txt      (Group keywords alphabetically by first letter)")
-        print(f"    %file.txt      (Show most frequent starting letters)")
-        print("    $file.txt      (List palindromic keywords)")
-        print("    !              (Print instructions again)")
-        print("    \\              (Exit this feature)")
-        print("----------------------------------------------------------------------")
+        ui = UserInterface()
+        ui.display_keyword_analysis_feature() # Reuse centralized instructions
     
     # Main loop that takes user input and triggers appropriate methods
     def command_prompt(self):

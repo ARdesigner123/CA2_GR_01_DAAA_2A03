@@ -1,6 +1,5 @@
 import os
 
-
 #Class Created By Stephen
 class UserInterface():
 
@@ -102,7 +101,32 @@ class UserInterface():
             else:
                 print(f"{i} : {guess}")
         print("------------------------------------------------------------")
+    
+    # Function to display Feature 5: Advanced Trie Tools (Aaron)
+    def display_advanced_trie_tools(self):
+        print("----------------------------------------------------------------------")
+        print("Advanced Trie Tools - Feature 5 (Aaron Ng)")
+        print("----------------------------------------------------------------------")
+        print("    ~file1,file2    (load and merge two Trie keyword files into one)")
+        print("    >file.txt       (show top keywords by frequency from a file)")
+        print("    +               (add a keyword to a TXT file and update Trie)")
+        print("    -               (remove a keyword from a TXT file and update Trie)")
+        print("    ^               (replace 'old' keyword with 'new' in current Trie)")
+        print("    !               (print instructions again)")
+        print("    \\               (exit)")
+        print("----------------------------------------------------------------------")
 
-
-
-
+    # Function to display Feature 6: Keyword Analysis Feature (Aaron)
+    def display_keyword_analysis_feature(self):
+        print("----------------------------------------------------------------------")
+        print("Extra Feature Two - Keyword Tools (Aaron Ng)")
+        print("----------------------------------------------------------------------")
+        print("    =file1,file2   (Compare common keywords in both TXT files)")
+        print("    >from,to       (Transfer a keyword from one TXT file to another)")
+        print("    #file.txt      (Show keywords from longest to shortest)")
+        print("    *file.txt      (Group keywords alphabetically by first letter)")
+        print("    %file.txt      (Show most frequent starting letters)")
+        print("    $file.txt      (List palindromic keywords)")
+        print("    !              (Print instructions again)")
+        print("    \\              (Exit this feature)")
+        print("----------------------------------------------------------------------")

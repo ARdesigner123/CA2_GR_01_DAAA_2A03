@@ -5,6 +5,7 @@
 # ----------------------------------------
 
 from feature_base import FeatureBase
+from user_interface import UserInterface
 import os
 
 class AdvancedTrieFeature(FeatureBase):
@@ -15,17 +16,8 @@ class AdvancedTrieFeature(FeatureBase):
 
     def command_prompt(self):
         # Display feature banner and command instructions
-        print("----------------------------------------------------------------------")
-        print("Advanced Trie Tools - Feature 5 (Aaron Ng)")
-        print("----------------------------------------------------------------------")
-        print("    ~file1,file2    (load and merge two Trie keyword files into one)")
-        print("    >file.txt       (show top keywords by frequency from a file)")
-        print("    +               (add a keyword to a TXT file and update Trie)")
-        print("    -               (remove a keyword from a TXT file and update Trie)")
-        print("    ^               (replace 'old' keyword with 'new' in current Trie)")
-        print("    !               (print instructions again)")
-        print("    \\               (exit)")
-        print("----------------------------------------------------------------------")
+        ui = UserInterface()
+        ui.display_advanced_trie_tools() # Reuse centralized instructions
 
         # Main loop to handle user input commands
         while True:
