@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from collections import Counter
 from user_interface import UserInterface as UI
 from trie_editor import Trie, TrieEditor,TrieNode
 
@@ -21,7 +20,7 @@ class TrieChart:
 
     def _chart_by_first_letter(self):
         print("Generating chart by first letter...")
-        letter_counts = Counter()
+        letter_counts = {}
 
         def dfs(node, path):
             if node.is_end_of_word and path:

@@ -1,115 +1,106 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import scipy
+import matplotlib.patches as mpatches
 
 class TrieVisualizer:
     def __init__(self, trie):
         self.trie = trie
 
     def visualize_structure(self):
-        print("Generating trie structure visualization with networkx...")
+        print("Generating trie structure visualization (top-down with word buildup)...")
 
         G = nx.DiGraph()
         node_id = 0
-        node_map = {}  # Map from id(node) to node_id
+        node_map = {}
+        positions = {}
+        node_colors = []
 
-        def dfs(node, path):
+        def dfs(node, path, depth, x_offset):
             nonlocal node_id
             current_id = node_id
-            label = path[-1] if path else "ROOT"
+
+            # Node label is the progressive word
+            label = path if path else "ROOT"
             G.add_node(current_id, label=label)
             node_map[id(node)] = current_id
+
+            # Assign position (top-down)
+            positions[current_id] = (x_offset[0], -depth)
+
+            # Color: green if complete word, else blue
+            if node.is_end_of_word:
+                node_colors.append('lightgreen')
+            else:
+                node_colors.append('lightblue')
+
             node_id += 1
 
-            for ch, child in node.children.items():
-                child_id = dfs(child, path + ch)
+            for ch, child in sorted(node.children.items()):
+                x_offset[0] += 1
+                child_id = dfs(child, path + ch, depth + 1, x_offset)
                 G.add_edge(current_id, child_id)
 
             return current_id
 
-        dfs(self.trie.root, "")
+        dfs(self.trie.root, "", 0, [0])
 
         labels = nx.get_node_attributes(G, 'label')
-        pos = nx.spring_layout(G, k=0.5, iterations=100)
-        plt.figure(figsize=(12, 8))
-        nx.draw(G, pos, with_labels=True, labels=labels, node_color='skyblue',
-                node_size=1200, font_size=10, arrows=True)
-        plt.title("Trie Structure")
+        plt.figure(figsize=(14, 8))
+        nx.draw(G, pos=positions, with_labels=True, labels=labels,
+                node_color=node_colors, node_size=1200, font_size=10, arrows=True)
+
+        plt.legend(handles=[
+            mpatches.Patch(color='lightblue', label='Prefix'),
+            mpatches.Patch(color='lightgreen', label='Complete Word')
+        ])
+
+        plt.title("Trie Structure (Progressive Word Formation)")
+        plt.axis('off')
+        plt.tight_layout()
         plt.show()
 
+
+
+
     def visualize_path(self, word):
+        print(f"Visualizing path for '{word}'...")
+
         G = nx.DiGraph()
         node = self.trie.root
-        current = ''
+        current = ""
+        positions = {}
+        node_colors = []
 
-        for char in word:
-            G.add_edge(current, current + char)
-            current += char
+        G.add_node(current)
+        positions[current] = (0, 0)
+        node_colors.append('lightblue')  # root
+
+        for i, char in enumerate(word):
+            next_label = current + char
+            G.add_node(next_label)
+            G.add_edge(current, next_label)
+            positions[next_label] = (i + 1, -i - 1)
+
             if char in node.children:
                 node = node.children[char]
+                # If this node ends a word, color it green
+                if node.is_end_of_word and i == len(word) - 1:
+                    node_colors.append('lightgreen')
+                else:
+                    node_colors.append('lightblue')
             else:
                 print(f"'{word}' not found in trie.")
                 return
 
-        pos = nx.spring_layout(G)
-        nx.draw(G, pos, with_labels=True, node_color='lightblue', arrows=True)
+            current = next_label
+
+        plt.figure(figsize=(8, 5))
+        nx.draw(G, pos=positions, with_labels=True, node_color=node_colors,
+                node_size=1000, font_size=10, arrows=True)
         plt.title(f"Path for '{word}'")
-        plt.show()
-
-    def visualize_frequencies(self):
-        words = []
-        freqs = []
-
-        def dfs(node, prefix):
-            if node.is_end_of_word:
-                words.append(prefix)
-                freqs.append(node.frequency)
-            for char, child in node.children.items():
-                dfs(child, prefix + char)
-
-        dfs(self.trie.root, "")
-
-        if not words:
-            print("Trie is empty.")
-            return
-
-        plt.figure(figsize=(10, 5))
-        plt.bar(words, freqs, color='skyblue')
-        plt.xlabel("Words")
-        plt.ylabel("Frequency")
-        plt.title("Keyword Frequencies in Trie")
-        plt.xticks(rotation=45, ha='right')
+        plt.axis('off')
         plt.tight_layout()
-        plt.show()
-
-    def visualize_subtree_from_prefix(self, prefix):
-        # Step 1: Navigate to the prefix node
-        node = self.trie.root
-        current = ""
-        for char in prefix:
-            if char in node.children:
-                node = node.children[char]
-                current += char
-            else:
-                print(f"Prefix '{prefix}' not found in trie.")
-                return
-
-        # Step 2: Build graph from the subtree
-        G = nx.DiGraph()
-
-        def dfs(n, path_label):
-            for char, child in n.children.items():
-                next_label = path_label + char
-                G.add_edge(path_label, next_label)
-                dfs(child, next_label)
-
-        dfs(node, prefix)
-
-        # Step 3: Draw
-        pos = nx.spring_layout(G)
-        nx.draw(G, pos, with_labels=True, node_color='lightgreen',
-                node_size=800, font_size=10, arrows=True)
-        plt.title(f"Subtree from prefix '{prefix}'")
         plt.show()
 
     def get_longest_path(self):

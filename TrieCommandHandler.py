@@ -253,9 +253,6 @@ class TrieCommandHandler:
                     else:
                         print("No word entered.")
 
-                elif cmd == '%':
-                    self.visualizer.visualize_frequencies()
-
                 elif cmd == '*':
                     self.visualizer.visualize_structure()
 
