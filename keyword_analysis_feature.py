@@ -5,14 +5,15 @@
 # ----------------------------------------
 
 from feature_base import FeatureBase
+from user_interface import UserInterface
 import os
 
 class KeywordAnalysisFeature(FeatureBase):
     # Initialize with two Trie instances for comparison or transfer
-    def __init__(self, trie_class):
-        self.trie_class = trie_class
-        self.trie1 = self.trie_class()
-        self.trie2 = self.trie_class()
+    def __init__(self, trie_instance):
+        self.trie1 = trie_instance
+        self.trie2 = trie_instance.__class__()  # Or create another one as needed
+        self.trie_class = trie_instance.__class__
     
     # Entry point for the feature
     def run(self):
@@ -20,18 +21,8 @@ class KeywordAnalysisFeature(FeatureBase):
     
     # Print available commands for the feature
     def print_instructions(self):
-        print("----------------------------------------------------------------------")
-        print("Extra Feature Two - Keyword Tools (Aaron Ng)")
-        print("----------------------------------------------------------------------")
-        print("    =file1,file2   (Compare common keywords in both TXT files)")
-        print("    >from,to       (Transfer a keyword from one TXT file to another)")
-        print("    #file.txt      (Show keywords from longest to shortest)")
-        print("    *file.txt      (Group keywords alphabetically by first letter)")
-        print(f"    %file.txt      (Show most frequent starting letters)")
-        print("    $file.txt      (List palindromic keywords)")
-        print("    !              (Print instructions again)")
-        print("    \\              (Exit this feature)")
-        print("----------------------------------------------------------------------")
+        ui = UserInterface()
+        ui.display_keyword_analysis_feature() # Reuse centralized instructions
     
     # Main loop that takes user input and triggers appropriate methods
     def command_prompt(self):
