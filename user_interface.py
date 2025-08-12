@@ -14,6 +14,9 @@ class UserInterface():
         print("*                                                               *")
         print("*****************************************************************\n\n")
 
+    def quit_text(self):
+        print("Exiting the Full Command Promot . Bye...")
+
     # Function to display the menu (Aaron)
     def display_menu(self):
         print("Please select your choice ('1','2','3','4','5','6','7'):")

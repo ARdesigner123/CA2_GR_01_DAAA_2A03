@@ -174,7 +174,8 @@ class TrieCommandHandler:
                     continue
 
                 elif cmd == '\\':
-                    self.terminate()
+                    UI.quit_text()
+                    break
 
                 else:
                     print("Invalid command! Please try again.")
@@ -223,7 +224,7 @@ class TrieCommandHandler:
                     return
 
                 elif cmd == '\\':
-                    print("Predicting Restore Function")
+                    UI.quit_text()
                     break
 
                 else:
@@ -257,7 +258,7 @@ class TrieCommandHandler:
                     self.visualizer.visualize_structure()
 
                 elif cmd == '\\':
-                    print("Exiting Trie Chart Drawing.")
+                    UI.quit_text()
                     break
 
                 else:
@@ -285,7 +286,7 @@ class TrieCommandHandler:
                     self._review_recent_rounds()
 
                 elif cmd == '\\':
-                    print("Exiting Auto Complete Game.")
+                    UI.quit_text()
                     break
 
                 else:
