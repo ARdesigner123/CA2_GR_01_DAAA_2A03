@@ -81,17 +81,19 @@ class UserInterface():
         print("    \\              (exit\")")
         print("------------------------------------------------------------")
 
-    def autoCompleteGame(self):
-        print("------------------------------------------------------------")
-        print("Auto Complete Game Menu:")
-        print("    '~','#','1','2','\\'")
-        print("------------------------------------------------------------")
-        print("    ~               (read keywords from file to make Trie)")
-        print("    #               (display Trie)")
-        print("    1               (Start Round)")
-        print("    2               (Review Recent Rounds)")
-        print("    \\              (exit\")")
-        print("------------------------------------------------------------")
+    def autoCompleteGame(self): 
+        print("------------------------------------------------------------") 
+        print("Auto Complete Menu:") 
+        print(" '~','#','1','2','\\'") 
+        print("------------------------------------------------------------") 
+        print(" ~ (read keywords from file to make Trie)") 
+        print(" # (display Trie)") 
+        print(" 1 (Start Guess)") 
+        print(" 2 (Review Recent Guesses)") 
+
+        print(" \\ (exit\")") 
+
+        print("------------------------------------------------------------") 
 
     def Game_UI(self, guesses):
         print("------------------------------------------------------------")

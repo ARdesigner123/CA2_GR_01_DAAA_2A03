@@ -143,10 +143,13 @@ class Trie:
             print(f"File '{filename}' not found.")
     
     # Get predictions with support for wildcards '*'
-    def get_words_with_prefix(self, prefix):
+    def get_words_with_prefix(self, prefix, max_results=50):
         results = []
 
         def _dfs(node, current_prefix, index):
+            if len(results) >= max_results:
+                return
+
             if index == len(prefix):
                 if node.is_end_of_word:
                     results.append((current_prefix, node.frequency))
@@ -158,22 +161,29 @@ class Trie:
             if ch == '*':
                 for next_ch, next_node in node.children.items():
                     _dfs(next_node, current_prefix + next_ch, index + 1)
+                    if len(results) >= max_results:
+                        return
             elif ch in node.children:
                 _dfs(node.children[ch], current_prefix + ch, index + 1)
 
         _dfs(self.root, '', 0)
         return results
-    
+
     def find_best_match(self, pattern):
-        best_match = ("", -1)  # (word, frequency)
+        best_match = ("", -1)
+        memo = {}
 
         def _dfs(node, index, path):
             nonlocal best_match
 
+            key = (id(node), index)
+            if key in memo and memo[key] >= best_match[1]:
+                return
+            memo[key] = best_match[1]
+
             if index == len(pattern):
-                if node.is_end_of_word:
-                    if node.frequency > best_match[1]:
-                        best_match = (path, node.frequency)
+                if node.is_end_of_word and node.frequency > best_match[1]:
+                    best_match = (path, node.frequency)
                 return
 
             ch = pattern[index]
