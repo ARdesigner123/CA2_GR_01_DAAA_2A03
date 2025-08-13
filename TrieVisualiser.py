@@ -103,6 +103,59 @@ class TrieVisualizer:
         plt.tight_layout()
         plt.show()
 
+
+    def visualize_subtree_from_prefix(self, prefix):
+        print(f"Visualizing subtree from prefix '{prefix}'...")
+
+        # Step 1: Find the starting node
+        node = self.trie.root
+        for char in prefix:
+            if char in node.children:
+                node = node.children[char]
+            else:
+                print(f"Prefix '{prefix}' not found in trie.")
+                return
+
+        # Step 2: Build graph for subtree
+        G = nx.DiGraph()
+        node_colors = {}
+        positions = {}
+        node_id_map = {}
+        next_id = [0]
+
+        def dfs(current_node, path, depth, x_offset):
+            cur_id = next_id[0]
+            next_id[0] += 1
+            G.add_node(cur_id, label=path if path else "ROOT")
+            positions[cur_id] = (x_offset[0], -depth)
+            node_colors[cur_id] = 'lightgreen' if current_node.is_end_of_word else 'lightblue'
+
+            for ch, child in sorted(current_node.children.items()):
+                x_offset[0] += 1
+                child_id = dfs(child, path + ch, depth + 1, x_offset)
+                G.add_edge(cur_id, child_id)
+
+            return cur_id
+
+        dfs(node, prefix, 0, [0])
+
+        # Step 3: Draw
+        labels = nx.get_node_attributes(G, 'label')
+        colors = [node_colors[n] for n in G.nodes()]
+        plt.figure(figsize=(10, 6))
+        nx.draw(G, pos=positions, with_labels=True, labels=labels,
+                node_color=colors, node_size=1200, font_size=10, arrows=True)
+
+        plt.legend(handles=[
+            mpatches.Patch(color='lightblue', label='Prefix'),
+            mpatches.Patch(color='lightgreen', label='Complete Word')
+        ])
+        plt.title(f"Subtree for prefix '{prefix}'")
+        plt.axis('off')
+        plt.tight_layout()
+        plt.show()
+
+
     def get_longest_path(self):
         def dfs(node, path):
             nonlocal longest_path

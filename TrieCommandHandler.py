@@ -267,7 +267,7 @@ class TrieCommandHandler:
         elif function == "autoComplete":
             UI.autoCompleteGame()
             while True:
-                cmd = input("Game Command: ").strip()
+                cmd = input("Auto Complete Command: ").strip()
 
                 if cmd == '~':
                     filename = input("Please enter input file: ").strip()

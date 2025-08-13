@@ -65,22 +65,3 @@ class AutoCompleteGame:
             for rank, guess in enumerate(guesses, 1):
                 print(f"   {rank}: {guess}")
             print("-" * 50)
-
-    def run(self):
-        print("== Autocomplete Game ==")
-        while True:
-            print("\nMenu:")
-            print("1. Start new round")
-            print("2. Review recent rounds")
-            print("3. Exit")
-            choice = input("Choose an option: ").strip()
-
-            if choice == '1':
-                self._start_autoComplete_round()
-            elif choice == '2':
-                self._review_recent_rounds()
-            elif choice == '3':
-                print("Goodbye!")
-                break
-            else:
-                print("Invalid option.")
