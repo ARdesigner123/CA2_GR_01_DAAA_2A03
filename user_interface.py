@@ -77,7 +77,6 @@ class UserInterface():
         print("    *               (Visualize Trie Structure with NetworkX)")
         print("    ^               (Visualize Longest Trie Structure with NetworkX)")
         print("    !               (Visualize Specifc Word/Prefix Path with NetworkX)")
-        print("    %               (Generate Chart by frequency)")
         print("    \\              (exit\")")
         print("------------------------------------------------------------")
 
