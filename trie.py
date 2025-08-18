@@ -141,6 +141,17 @@ class Trie:
             print(f"Keywords loaded from '{filename}'.")
         except FileNotFoundError:
             print(f"File '{filename}' not found.")
+
+    # Save Keywords to File
+    def save_keywords_to_file(self, filename):
+        try:
+            with open(filename, 'w') as f:
+                all_words = self.get_all_words_with_freq()
+                for word, freq in sorted(all_words):
+                    f.write(f"{word},{freq}\n")
+            print(f"Keywords saved to '{filename}'.")
+        except Exception as e:
+            print(f"Error saving to file '{filename}': {e}")
     
     # Get predictions with support for wildcards '*'
     def get_words_with_prefix(self, prefix, max_results=50):
