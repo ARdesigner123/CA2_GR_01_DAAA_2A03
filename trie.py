@@ -141,6 +141,43 @@ class Trie:
             print(f"Keywords loaded from '{filename}'.")
         except FileNotFoundError:
             print(f"File '{filename}' not found.")
+    
+    # Save visual representation of the trie to file
+    def save_trie_visual(self, filename):
+        try:
+            with open(filename, 'w') as f:
+                def _display_to_file(current, prefix, depth):
+                    indent = '.' * depth
+                    lines = []
+                    
+                    # Print prefix
+                    lines.append(indent + '[' + prefix)
+
+                    # If it's a word, print frequency
+                    if current.is_end_of_word:
+                        lines.append('.' * (depth + 1) + f">{prefix}({current.frequency})*")
+
+                    # Recurse into children
+                    for ch, next_node in sorted(current.children.items()):
+                        lines.extend(_display_to_file(next_node, prefix + ch, depth + 1))
+
+                    # Closing bracket
+                    lines.append(indent + ']')
+                    return lines
+
+                # Start from root
+                lines = ["["]
+                for ch, next_node in sorted(self.root.children.items()):
+                    lines.extend(_display_to_file(next_node, ch, 1))
+                lines.append("]")
+
+                # Write lines into file
+                for line in lines:
+                    f.write(line + "\n")
+
+            print(f"Trie visual saved to '{filename}'.")
+        except Exception as e:
+            print(f"Error saving trie visual: {e}")
 
     # Save Keywords to File
     def save_keywords_to_file(self, filename):

@@ -1,0 +1,4 @@
+car,2
+case,1
+cat,3
+dog,1
